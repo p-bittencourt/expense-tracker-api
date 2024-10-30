@@ -1,5 +1,6 @@
 import request from 'supertest';
-import app from '../app';
+import app from '@/app';
+import { IDValidationError } from '@/middleware/error.middleware';
 
 let server: any;
 
@@ -18,6 +19,16 @@ describe('User Controller', () => {
       .then((response) => {
         expect(response.status).toBe(200);
         expect(response.body).toBeInstanceOf(Array);
+        done();
+      });
+  });
+
+  it('should return 400 for invalid ID format', (done) => {
+    request(app)
+      .get('/api/users/invalid-id')
+      .then((response) => {
+        expect(response.status).toBe(400);
+        expect(response.body).toEqual({ error: 'Invalid ID format' });
         done();
       });
   });
