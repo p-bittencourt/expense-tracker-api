@@ -10,6 +10,7 @@ export const createUserRouter = (userController: UserController) => {
 
   router.get('/', userController.getAllUsers);
   router.get('/:id', validateObjectId, userController.getSingleUser);
+  router.post('/', userController.createUser);
 
   return router;
 };

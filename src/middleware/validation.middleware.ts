@@ -26,8 +26,7 @@ export const validateDTO = (dtoClass: any) => {
         property: error.property,
         constraints: error.constraints,
       }));
-      res.status(400).json({ errors: formattedErrors });
-      return;
+      return next(new IDValidationError(`${formattedErrors}`));
     }
 
     req.body = dtoObject;

@@ -1,3 +1,4 @@
+import { CreateUserDTO } from './user.dto';
 import User, { IUser } from './user.model';
 
 export class UserRepository {
@@ -9,7 +10,8 @@ export class UserRepository {
     return await User.findById(id).exec();
   }
 
-  async createUser(id: string): Promise<IUser | null> {
-    return null;
+  async createUser(userData: CreateUserDTO): Promise<IUser | null> {
+    const newUser = await User.create({ ...userData, expenses: [] });
+    return newUser;
   }
 }
