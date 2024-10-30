@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import { UserController } from './user.controller';
-import { validateObjectId } from '@/middleware/validation.middleware';
+import {
+  validateObjectId,
+  validateDTO,
+} from '@/middleware/validation.middleware';
 
 export const createUserRouter = (userController: UserController) => {
   const router = Router();
