@@ -1,10 +1,12 @@
 import { Router } from 'express';
 import { UserController } from './user.controller';
+import { validateObjectId } from '@/middleware/validation.middleware';
 
 export const createUserRouter = (userController: UserController) => {
   const router = Router();
 
   router.get('/', userController.getAllUsers);
+  router.get('/:id', validateObjectId, userController.getSingleUser);
 
   return router;
 };

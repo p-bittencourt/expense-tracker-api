@@ -7,4 +7,12 @@ export class UserService {
   async getAllUsers(): Promise<IUser[]> {
     return this.userRepository.findAll();
   }
+
+  async getUserById(id: string): Promise<IUser | null> {
+    const user = await this.userRepository.findById(id);
+    if (!user) {
+      return null;
+    }
+    return user;
+  }
 }
