@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { UserService } from './user.services';
-import { ObjectId } from 'mongoose';
 
 export class UserController {
   constructor(private userService: UserService) {}

@@ -8,4 +8,8 @@ export class UserRepository {
   async findById(id: string): Promise<IUser | null> {
     return await User.findById(id).exec();
   }
+
+  async createUser(id: string): Promise<IUser | null> {
+    return null;
+  }
 }

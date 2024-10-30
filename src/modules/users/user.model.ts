@@ -5,6 +5,7 @@ const UserSchema: Schema = new Schema(
   {
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
+    password: { type: String, required: true, unique: true },
     expenses: [{ type: Schema.Types.ObjectId, ref: 'Expenses' }],
   },
   { timestamps: true }
@@ -13,6 +14,7 @@ const UserSchema: Schema = new Schema(
 //
 export interface IUser extends Document {
   username: string;
+  password: string;
   email: string;
   expenses: ObjectId[];
   createdAt: Date;
