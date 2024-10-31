@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import { plainToInstance } from 'class-transformer';
-import { IDValidationError } from './error.middleware';
 import { validate } from 'class-validator';
+import { ValidationError } from '@/types/errors';
 
 export const validateObjectId = (
   req: Request,
@@ -11,7 +11,7 @@ export const validateObjectId = (
 ) => {
   const { id } = req.params;
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return next(new IDValidationError('Invalid ID format'));
+    return next(new ValidationError('Invalid ID format'));
   }
   next();
 };
@@ -26,7 +26,7 @@ export const validateDTO = (dtoClass: any) => {
         property: error.property,
         constraints: error.constraints,
       }));
-      return next(new IDValidationError(`${formattedErrors}`));
+      return next(new ValidationError(`${formattedErrors}`));
     }
 
     req.body = dtoObject;
