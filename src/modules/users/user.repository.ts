@@ -13,9 +13,7 @@ export class UserRepository {
 
   async createUser(userData: CreateUserDTO): Promise<IUser> {
     try {
-      console.log('Attempting to create user with data: ', userData);
       const newUser = await User.create({ ...userData, expenses: [] });
-      console.log('User created successfully', newUser);
       return newUser;
     } catch (error: any) {
       if (error.code === 11000) {
@@ -23,7 +21,7 @@ export class UserRepository {
         throw new ConflictError(`A user with this ${field} already exists`);
       }
 
-      // Log the error for debugging and monitoring
+      // Log uknown error for debugging and monitoring
       console.error('Database error:', {
         operation: 'createUser',
         error: error.message,

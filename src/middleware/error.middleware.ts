@@ -9,11 +9,7 @@ export const errorHandler: ErrorRequestHandler = (
 ): void => {
   // LOG ERROR FOR DEBUGGING,
   // use proper logging service in production
-  console.error('Error details:', {
-    name: err.name,
-    message: err.message,
-    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
-  });
+  // console.error('Error details:', err);
 
   // Handle known errors
   if (err instanceof AppError) {

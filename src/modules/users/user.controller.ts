@@ -24,9 +24,12 @@ export class UserController {
   ): Promise<void> => {
     try {
       const id: string = req.params.id;
-      const user = this.userService.getUserById(id);
+      const user = await this.userService.getUserById(id);
       if (!user) {
-        res.status(404).json({ error: 'User not found' });
+        res.status(404).json({
+          message: 'User not found',
+          status: 'not_found',
+        });
         return;
       }
       res.json(user);
@@ -47,4 +50,8 @@ export class UserController {
       next(error);
     }
   };
+
+  // TODO: unit test create user before implementing delete user
+  // TODO: check that we can't create users without a mandatory field, or with an unexisting field
+  // TODO: study how to use mongodb-memory-server before further testing of db operations
 }

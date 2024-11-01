@@ -17,11 +17,8 @@ export class UserService {
     return user;
   }
 
-  async createUser(userData: CreateUserDTO): Promise<IUser | null> {
+  async createUser(userData: CreateUserDTO): Promise<IUser> {
     const user = await this.userRepository.createUser(userData);
-    if (!user) {
-      return null;
-    }
     return user;
   }
 }
