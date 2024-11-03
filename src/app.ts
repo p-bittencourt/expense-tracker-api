@@ -6,13 +6,12 @@ import { UserController } from './modules/users/user.controller';
 import { UserService } from './modules/users/user.services';
 import { UserRepository } from './modules/users/user.repository';
 
-export function createApp(userService: UserService) {
+export function createApp(userController: UserController) {
   connectDB();
   const app = express();
   // Middleware
   app.use(express.json());
 
-  const userController = new UserController(userService);
   // Routes
   app.use('/api/users', createUserRouter(userController));
 
@@ -24,5 +23,6 @@ export function createApp(userService: UserService) {
 // Dependencies
 const userRepository = new UserRepository();
 const userService = new UserService(userRepository);
-const app = createApp(userService);
+const userController = new UserController(userService);
+const app = createApp(userController);
 export default app;
