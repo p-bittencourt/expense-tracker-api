@@ -82,9 +82,26 @@ describe('User Controller', () => {
         });
     });
 
-    it('should return a user when found', async () => {});
+    it('should return a user when found', async () => {
+      const mockUser: Partial<IUser> = {
+        _id: '507f1f77bcf86cd799439011',
+        username: 'John Doe',
+        email: 'john@example.com',
+        expenses: [],
+      };
 
-    // it('should retrieve a user when a valid ID is provided', async () => {});
+      mockUserService.getUserById = jest
+        .fn()
+        .mockResolvedValue(mockUser as IUser);
+
+      const response = await request(app).get(
+        '/api/users/507f1f77bcf86cd799439011'
+      );
+
+      expect(response.status).toBe(200);
+      expect(mockUserService.getUserById).toHaveBeenCalled();
+      expect(response.body).toEqual(mockUser);
+    });
   });
 
   // it('should retrieve an array of users', (done) => {
