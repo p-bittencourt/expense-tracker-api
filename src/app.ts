@@ -7,7 +7,6 @@ import { UserService } from './modules/users/user.services';
 import { UserRepository } from './modules/users/user.repository';
 
 export function createApp(userController: UserController) {
-  connectDB();
   const app = express();
   // Middleware
   app.use(express.json());
@@ -21,8 +20,18 @@ export function createApp(userController: UserController) {
 }
 
 // Dependencies
-const userRepository = new UserRepository();
-const userService = new UserService(userRepository);
-const userController = new UserController(userService);
+export function initializeDependencies() {
+  const userRepository = new UserRepository();
+  const userService = new UserService(userRepository);
+  const userController = new UserController(userService);
+  return userController;
+}
+
+const userController = initializeDependencies();
 const app = createApp(userController);
+
+if (process.env.NODE_ENV !== 'test') {
+  connectDB();
+}
+
 export default app;
