@@ -6,19 +6,14 @@ export class UserService {
   constructor(private userRepository: UserRepository) {}
 
   async getAllUsers(): Promise<IUser[]> {
-    return this.userRepository.findAll();
+    return await this.userRepository.findAll();
   }
 
-  async getUserById(id: string): Promise<IUser | null> {
-    const user = await this.userRepository.findById(id);
-    if (!user) {
-      return null;
-    }
-    return user;
+  async getUserById(id: string): Promise<IUser> {
+    return await this.userRepository.findById(id);
   }
 
   async createUser(userData: CreateUserDTO): Promise<IUser> {
-    const user = await this.userRepository.createUser(userData);
-    return user;
+    return await this.userRepository.createUser(userData);
   }
 }

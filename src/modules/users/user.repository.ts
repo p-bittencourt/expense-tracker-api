@@ -1,14 +1,16 @@
 import { CreateUserDTO } from './user.dto';
 import User, { IUser } from './user.model';
-import { ConflictError, DatabaseError } from '@/types/errors';
+import { ConflictError, DatabaseError, NotFoundError } from '@/types/errors';
 
 export class UserRepository {
   async findAll(): Promise<IUser[]> {
     return await User.find().exec();
   }
 
-  async findById(id: string): Promise<IUser | null> {
-    return await User.findById(id).exec();
+  async findById(id: string): Promise<IUser> {
+    const user = await User.findById(id).exec();
+    if (!user) throw new NotFoundError(`User with ID ${id} not found`);
+    return user;
   }
 
   async createUser(userData: CreateUserDTO): Promise<IUser> {
