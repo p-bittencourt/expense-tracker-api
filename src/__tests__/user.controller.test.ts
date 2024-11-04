@@ -5,6 +5,7 @@ import { UserService } from '@/modules/users/user.services';
 import { UserController } from '@/modules/users/user.controller';
 import type { IUser } from '@/modules/users/user.model';
 import { CreateUserDTO } from '@/modules/users/user.dto';
+import { NotFoundError } from '@/types/errors';
 
 // Mock the UserRepository and UserService
 jest.mock('@/modules/users/user.repository');
@@ -30,9 +31,14 @@ describe('User Controller', () => {
 
     // Start the server
     server = app.listen(3001);
+
+    // Mock console.error to suppress error logs during tests
+    jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterAll((done) => {
+    // Restore console.error after testso
+    (console.error as jest.Mock).mockRestore();
     // Clean up the server
     server.close(done);
   });
@@ -56,7 +62,9 @@ describe('User Controller', () => {
   describe('GET /api/users/:id', () => {
     it('should return 404 when user is not found', async () => {
       // Mock the getUserById method to return null
-      mockUserService.getUserById = jest.fn().mockResolvedValue(null);
+      mockUserService.getUserById = jest
+        .fn()
+        .mockRejectedValue(new NotFoundError('User not found'));
 
       const response = await request(app).get(
         '/api/users/507f1f77bcf86cd799439011'
@@ -71,8 +79,6 @@ describe('User Controller', () => {
     });
 
     it('should return 400 for invalid ID format', async () => {
-      mockUserService.getUserById = jest.fn().mockResolvedValue(null);
-
       const response = await request(app).get('/api/users/invalid-id');
 
       expect(response.status).toBe(400);

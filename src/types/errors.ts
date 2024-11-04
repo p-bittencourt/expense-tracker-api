@@ -12,7 +12,7 @@ export class AppError extends Error {
 
 export class NotFoundError extends AppError {
   constructor(message: string) {
-    super(404, 'not_found_error', message);
+    super(404, 'not_found', message);
   }
 }
 
