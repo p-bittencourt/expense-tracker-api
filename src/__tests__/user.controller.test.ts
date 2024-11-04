@@ -10,17 +10,6 @@ import { CreateUserDTO } from '@/modules/users/user.dto';
 jest.mock('@/modules/users/user.repository');
 jest.mock('@/modules/users/user.services');
 
-// Sample mock user data
-// const mockUser: Partial<IUser> = {
-//   _id: '507f1f77bcf86cd799439011',
-//   username: 'John Doe',
-//   password: '1234',
-//   email: 'john@example.com',
-//   expenses: [],
-//   createdAt: new Date(),
-//   updatedAt: new Date(),
-// };
-
 describe('User Controller', () => {
   let app: any;
   let server: any;
@@ -141,14 +130,4 @@ describe('User Controller', () => {
       expect(mockUserService.createUser).toHaveBeenCalledWith(newUser);
     });
   });
-
-  // it('should retrieve an array of users', (done) => {
-  //   request(app)
-  //     .get('/api/users')
-  //     .then((response) => {
-  //       expect(response.status).toBe(200);
-  //       expect(response.body).toBeInstanceOf(Array);
-  //       done();
-  //     });
-  // });
 });

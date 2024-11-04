@@ -16,19 +16,22 @@ export class UserRepository {
       const newUser = await User.create({ ...userData, expenses: [] });
       return newUser;
     } catch (error: any) {
-      if (error.code === 11000) {
-        const field = Object.keys(error.keyPattern[0]);
-        throw new ConflictError(`A user with this ${field} already exists`);
-      }
-
-      // Log uknown error for debugging and monitoring
-      console.error('Database error:', {
-        operation: 'createUser',
-        error: error.message,
-        stack: error.stack,
-      });
-
-      throw new DatabaseError('An error occurred while creating the user');
+      handleDatabaseError(error, 'createUser');
     }
   }
+}
+
+function handleDatabaseError(error: any, operation: string): never {
+  if (error.code === 11000) {
+    const field = Object.keys(error.keyPattern);
+    throw new ConflictError(`A user with this ${field} already exists`);
+  }
+  // Log uknown error for debugging and monitoring
+  console.error('Database error:', {
+    operation: 'createUser',
+    error: error.message,
+    stack: error.stack,
+  });
+
+  throw new DatabaseError(`An error occurred during ${operation}`);
 }
