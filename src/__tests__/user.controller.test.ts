@@ -4,6 +4,7 @@ import { UserRepository } from '@/modules/users/user.repository';
 import { UserService } from '@/modules/users/user.services';
 import { UserController } from '@/modules/users/user.controller';
 import type { IUser } from '@/modules/users/user.model';
+import { CreateUserDTO } from '@/modules/users/user.dto';
 
 // Mock the UserRepository and UserService
 jest.mock('@/modules/users/user.repository');
@@ -52,6 +53,17 @@ describe('User Controller', () => {
     jest.clearAllMocks();
   });
 
+  describe('GET /api/users', () => {
+    it('should retrieve an array of users', async () => {
+      mockUserService.getAllUsers = jest.fn().mockResolvedValue([]);
+
+      const response = await request(app).get('/api/users');
+
+      expect(response.status).toBe(200);
+      expect(response.body).toBeInstanceOf(Array);
+    });
+  });
+
   describe('GET /api/users/:id', () => {
     it('should return 404 when user is not found', async () => {
       // Mock the getUserById method to return null
@@ -69,17 +81,16 @@ describe('User Controller', () => {
       });
     });
 
-    it('should return 400 for invalid ID format', (done) => {
-      request(app)
-        .get('/api/users/invalid-id')
-        .then((response) => {
-          expect(response.status).toBe(400);
-          expect(response.body).toEqual({
-            message: 'Invalid ID format',
-            status: 'validation_error',
-          });
-          done();
-        });
+    it('should return 400 for invalid ID format', async () => {
+      mockUserService.getUserById = jest.fn().mockResolvedValue(null);
+
+      const response = await request(app).get('/api/users/invalid-id');
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        message: 'Invalid ID format',
+        status: 'validation_error',
+      });
     });
 
     it('should return a user when found', async () => {
@@ -101,6 +112,33 @@ describe('User Controller', () => {
       expect(response.status).toBe(200);
       expect(mockUserService.getUserById).toHaveBeenCalled();
       expect(response.body).toEqual(mockUser);
+    });
+  });
+
+  describe('POST /api/users', () => {
+    it('should return 201 when user is successfully added', async () => {
+      const newUser: CreateUserDTO = {
+        username: 'John Doe',
+        email: 'john@example.com',
+        password: '1234',
+      };
+
+      const mockUser: Partial<IUser> = {
+        _id: '507f1f77bcf86cd799439011',
+        username: 'John Doe',
+        email: 'john@example.com',
+        expenses: [],
+      };
+
+      mockUserService.createUser = jest
+        .fn()
+        .mockResolvedValue(mockUser as IUser);
+
+      const response = await request(app).post('/api/users/').send(newUser);
+
+      expect(response.status).toBe(201);
+      expect(response.body).toEqual(mockUser);
+      expect(mockUserService.createUser).toHaveBeenCalledWith(newUser);
     });
   });
 
