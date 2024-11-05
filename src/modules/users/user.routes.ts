@@ -12,7 +12,7 @@ export const createUserRouter = (userController: UserController) => {
   const router = Router();
 
   router.get('/', userController.getAllUsers);
-  router.get('/:id', validateObjectId, userController.getSingleUser);
+  router.get('/:id', validateObjectId, userController.getUserById);
   router.post(
     '/',
     validateContentType,
@@ -20,6 +20,7 @@ export const createUserRouter = (userController: UserController) => {
     validateDTO(CreateUserDTO),
     userController.createUser
   );
+  router.delete('/:id', validateObjectId, userController.deleteUser);
 
   return router;
 };

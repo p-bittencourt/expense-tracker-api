@@ -50,7 +50,15 @@ export class UserController implements IUserController {
     res: Response,
     next: NextFunction
   ): Promise<void> => {
-    throw new Error('Method not implemented');
+    try {
+      const user = await this.userService.deleteUser(req.params.id);
+      res.status(200).json({
+        user,
+        message: 'user successfully deleted',
+      });
+    } catch (error) {
+      next(error);
+    }
   };
 
   editUser = async (
@@ -60,4 +68,6 @@ export class UserController implements IUserController {
   ): Promise<void> => {
     throw new Error('Method not implemented');
   };
+
+  // TODO: remove password property from responses sent to the client
 }

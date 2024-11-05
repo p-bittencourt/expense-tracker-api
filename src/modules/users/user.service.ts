@@ -18,8 +18,8 @@ export class UserService implements IUserService {
     return await this.userRepository.createUser(userData);
   }
 
-  async deleteUser(id: string): Promise<void> {
-    throw new Error('Method not implemented.');
+  async deleteUser(id: string): Promise<IUser> {
+    return await this.userRepository.deleteUser(id);
   }
 
   async editUser(id: string, userData: Partial<CreateUserDTO>): Promise<IUser> {

@@ -5,29 +5,43 @@ import { ConflictError, DatabaseError, NotFoundError } from '@/types/errors';
 
 export class UserRepository implements IUserRepository {
   async getAllUsers(): Promise<IUser[]> {
-    return await User.find().exec();
+    try {
+      return await User.find().exec();
+    } catch (error) {
+      handleDatabaseError(error, 'getAllUsers');
+    }
   }
 
   async getUserById(id: string): Promise<IUser> {
-    const user = await User.findById(id).exec();
-    if (!user) throw new NotFoundError(`User with ID ${id} not found`);
-    return user;
+    try {
+      const user = await User.findById(id).exec();
+      if (!user) throw new NotFoundError(`User with ID ${id} not found`);
+      return user;
+    } catch (error) {
+      handleDatabaseError(error, 'getUserId');
+    }
   }
 
   async createUser(userData: CreateUserDTO): Promise<IUser> {
     try {
       const newUser = await User.create({ ...userData, expenses: [] });
       return newUser;
-    } catch (error: any) {
+    } catch (error) {
       handleDatabaseError(error, 'createUser');
     }
   }
 
-  async editUser(id: string, userData: Partial<CreateUserDTO>): Promise<IUser> {
-    throw new Error('Method not implemented.');
+  async deleteUser(id: string): Promise<IUser> {
+    try {
+      const user = await User.findByIdAndDelete(id);
+      if (!user) throw new NotFoundError(`User not found`);
+      return user;
+    } catch (error) {
+      handleDatabaseError(error, 'deleteUser');
+    }
   }
 
-  async deleteUser(id: string): Promise<void> {
+  async editUser(id: string, userData: Partial<CreateUserDTO>): Promise<IUser> {
     throw new Error('Method not implemented.');
   }
 }
