@@ -37,6 +37,13 @@ export class UpdateUserDTO {
   @IsOptional()
   @IsString()
   email?: string;
+  @IsString()
+  @MinLength(8, { message: 'Password must be at least 9 characters long' })
+  @Matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, {
+    message: 'Password must contain at least one letter and one number',
+  })
+  @IsOptional()
+  password?: string;
 }
 
 export class UserResponseDTO {

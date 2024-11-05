@@ -1,4 +1,4 @@
-import { CreateUserDTO } from '../user.dto';
+import { CreateUserDTO, UpdateUserDTO } from '../user.dto';
 import { IUser } from '../user.model';
 
 export interface IUserRepository {
@@ -6,5 +6,5 @@ export interface IUserRepository {
   getUserById(id: string): Promise<IUser>;
   createUser(userData: CreateUserDTO): Promise<IUser>;
   deleteUser(id: string): Promise<IUser>;
-  editUser(id: string, userData: Partial<CreateUserDTO>): Promise<IUser>;
+  editUser(id: string, userData: UpdateUserDTO): Promise<IUser>;
 }

@@ -1,6 +1,6 @@
 import { UserRepository } from './user.repository';
 import type { IUser } from './user.model';
-import { CreateUserDTO, UserResponseDTO } from './user.dto';
+import { CreateUserDTO, UpdateUserDTO, UserResponseDTO } from './user.dto';
 import { IUserService } from './interfaces/IUserServices';
 
 export class UserService implements IUserService {
@@ -24,7 +24,11 @@ export class UserService implements IUserService {
     return new UserResponseDTO(deletedUser);
   }
 
-  async editUser(id: string, userData: Partial<CreateUserDTO>): Promise<IUser> {
-    throw new Error('Method not implemented.');
+  async editUser(
+    id: string,
+    userData: UpdateUserDTO
+  ): Promise<UserResponseDTO> {
+    const editedUser = await this.userRepository.editUser(id, userData);
+    return new UserResponseDTO(editedUser);
   }
 }

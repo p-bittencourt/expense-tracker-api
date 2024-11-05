@@ -6,7 +6,7 @@ import {
   validateContentType,
   sanitizeUserInput,
 } from '@/middleware/validation.middleware';
-import { CreateUserDTO } from './user.dto';
+import { CreateUserDTO, UpdateUserDTO } from './user.dto';
 
 export const createUserRouter = (userController: UserController) => {
   const router = Router();
@@ -21,6 +21,12 @@ export const createUserRouter = (userController: UserController) => {
     userController.createUser
   );
   router.delete('/:id', validateObjectId, userController.deleteUser);
+  router.patch(
+    '/:id',
+    validateContentType,
+    validateDTO(UpdateUserDTO),
+    userController.editUser
+  );
 
   return router;
 };

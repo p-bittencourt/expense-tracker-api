@@ -1,5 +1,5 @@
 import { IUserRepository } from './interfaces/IUserRepository';
-import { CreateUserDTO } from './user.dto';
+import { CreateUserDTO, UpdateUserDTO } from './user.dto';
 import User, { IUser } from './user.model';
 import { ConflictError, DatabaseError, NotFoundError } from '@/types/errors';
 
@@ -41,8 +41,14 @@ export class UserRepository implements IUserRepository {
     }
   }
 
-  async editUser(id: string, userData: Partial<CreateUserDTO>): Promise<IUser> {
-    throw new Error('Method not implemented.');
+  async editUser(id: string, userData: UpdateUserDTO): Promise<IUser> {
+    try {
+      const user = await User.findByIdAndUpdate(id, userData, { new: true });
+      if (!user) throw new NotFoundError('User not found');
+      return user;
+    } catch (error) {
+      handleDatabaseError(error, 'editUser');
+    }
   }
 }
 
