@@ -10,7 +10,7 @@ import type { Express } from 'express';
 
 // Mock the UserRepository and UserService
 jest.mock('@/modules/users/user.repository');
-jest.mock('@/modules/users/user.services');
+jest.mock('@/modules/users/user.service');
 
 describe('User Controller', () => {
   let app: Express;
@@ -46,10 +46,12 @@ describe('User Controller', () => {
     it('should retrieve an array of users', async () => {
       mockUserService.getAllUsers = jest.fn().mockResolvedValue([]);
 
-      const response = await request(app).get('/api/users');
-
-      expect(response.status).toBe(200);
-      expect(response.body).toBeInstanceOf(Array);
+      await request(app)
+        .get('/api/users')
+        .expect(200)
+        .expect((res) => {
+          expect(res.body).toBeInstanceOf(Array);
+        });
     });
   });
 
@@ -59,26 +61,28 @@ describe('User Controller', () => {
         .fn()
         .mockRejectedValue(new NotFoundError('User not found'));
 
-      const response = await request(app).get(
-        '/api/users/507f1f77bcf86cd799439011'
-      );
-
-      expect(response.status).toBe(404);
-      expect(mockUserService.getUserById).toHaveBeenCalled();
-      expect(response.body).toEqual({
-        message: 'User not found',
-        status: 'not_found',
-      });
+      await request(app)
+        .get('/api/users/507f1f77bcf86cd799439011')
+        .expect(404)
+        .expect((res) => {
+          expect(mockUserService.getUserById).toHaveBeenCalled();
+          expect(res.body).toEqual({
+            message: 'User not found',
+            status: 'not_found',
+          });
+        });
     });
 
     it('should return 400 for invalid ID format', async () => {
-      const response = await request(app).get('/api/users/invalid-id');
-
-      expect(response.status).toBe(400);
-      expect(response.body).toEqual({
-        message: 'Invalid ID format',
-        status: 'validation_error',
-      });
+      await request(app)
+        .get('/api/users/invalid-id')
+        .expect(400)
+        .expect((res) => {
+          expect(res.body).toEqual({
+            message: 'Invalid ID format',
+            status: 'validation_error',
+          });
+        });
     });
 
     it('should return a user when found', async () => {
@@ -93,13 +97,13 @@ describe('User Controller', () => {
         .fn()
         .mockResolvedValue(mockUser as IUser);
 
-      const response = await request(app).get(
-        '/api/users/507f1f77bcf86cd799439011'
-      );
-
-      expect(response.status).toBe(200);
-      expect(mockUserService.getUserById).toHaveBeenCalled();
-      expect(response.body).toEqual(mockUser);
+      await request(app)
+        .get('/api/users/507f1f77bcf86cd799439011')
+        .expect(200)
+        .expect((res) => {
+          expect(mockUserService.getUserById).toHaveBeenCalled();
+          expect(res.body).toEqual(mockUser);
+        });
     });
   });
 
