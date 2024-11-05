@@ -3,7 +3,7 @@ import connectDB from './config/database';
 import { errorHandler } from './middleware/error.middleware';
 import { createUserRouter } from './modules/users/user.routes';
 import { UserController } from './modules/users/user.controller';
-import { UserService } from './modules/users/user.services';
+import { UserService } from './modules/users/user.service';
 import { UserRepository } from './modules/users/user.repository';
 
 export function createApp(userController: UserController) {

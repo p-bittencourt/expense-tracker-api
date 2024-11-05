@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { createApp } from '@/app';
 import { UserRepository } from '@/modules/users/user.repository';
-import { UserService } from '@/modules/users/user.services';
+import { UserService } from '@/modules/users/user.service';
 import { UserController } from '@/modules/users/user.controller';
 import type { IUser } from '@/modules/users/user.model';
 import { CreateUserDTO } from '@/modules/users/user.dto';

@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { UserService } from './user.services';
+import { UserService } from './user.service';
+import { IUserController } from './interfaces/IUserController';
 
-export class UserController {
+export class UserController implements IUserController {
   constructor(private userService: UserService) {}
 
   getAllUsers = async (
@@ -42,6 +43,22 @@ export class UserController {
     } catch (error) {
       next(error);
     }
+  };
+
+  deleteUser = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    throw new Error('Method not implemented');
+  };
+
+  editUser = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    throw new Error('Method not implemented');
   };
 
   // TODO: unit test create user before implementing delete user
