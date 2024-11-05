@@ -164,4 +164,41 @@ describe('User Controller', () => {
         });
     });
   });
+
+  describe('DELETE /api/users/:id', () => {
+    it('should return 404 NotFoundError if user not found', async () => {
+      mockUserService.deleteUser = jest
+        .fn()
+        .mockRejectedValue(new NotFoundError('User not found'));
+
+      await request(app)
+        .delete('/api/users/507f1f77bcf86cd799439011')
+        .expect(404)
+        .expect((res) => {
+          expect(res.body).toHaveProperty('message');
+        });
+    });
+
+    it('should return 200 when successfully deleting the user', async () => {
+      const mockUser: Partial<IUser> = {
+        _id: '507f1f77bcf86cd799439011',
+        username: 'janeDoe',
+        email: 'janeDoe@email.com',
+        expenses: [],
+      };
+
+      mockUserService.deleteUser = jest.fn().mockResolvedValue(mockUser);
+
+      await request(app)
+        .delete('/api/users/507f1f77bcf86cd799439011')
+        .expect(200)
+        .expect((res) => {
+          expect(res.body).toHaveProperty('user', mockUser);
+          expect(res.body).toHaveProperty(
+            'message',
+            'User successfully deleted'
+          );
+        });
+    });
+  });
 });
