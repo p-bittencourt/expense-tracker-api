@@ -4,9 +4,14 @@ import { UserRepository } from '@/modules/users/user.repository';
 import { UserService } from '@/modules/users/user.service';
 import { UserController } from '@/modules/users/user.controller';
 import type { IUser } from '@/modules/users/user.model';
-import { CreateUserDTO } from '@/modules/users/user.dto';
+import {
+  CreateUserDTO,
+  UpdateUserDTO,
+  UserResponseDTO,
+} from '@/modules/users/user.dto';
 import { NotFoundError } from '@/types/errors';
 import type { Express } from 'express';
+import mongoose from 'mongoose';
 
 // Mock the UserRepository and UserService
 jest.mock('@/modules/users/user.repository');
@@ -31,9 +36,10 @@ describe('User Controller', () => {
     jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
-  afterAll(() => {
+  afterAll(async () => {
     // Restore console.error after testso
     jest.spyOn(console, 'error').mockRestore();
+    await mongoose.connection.close();
   });
 
   beforeEach(() => {
@@ -199,6 +205,41 @@ describe('User Controller', () => {
             'User successfully deleted'
           );
         });
+    });
+  });
+
+  describe('PATCH /api/users/:id', () => {
+    it('should successfully update an user', async () => {
+      const mockUser: Partial<IUser> = {
+        _id: '507f1f77bcf86cd799439011',
+        username: 'janeDoe',
+        email: 'janedoe@email.com',
+        expenses: [],
+      };
+      mockUserService.editUser = jest.fn().mockResolvedValue(mockUser);
+
+      await request(app)
+        .patch('/api/users/507f1f77bcf86cd799439011')
+        .send({ email: 'janedoe@email.com' })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.user.email).toEqual(mockUser.email);
+          expect(mockUserService.editUser).toHaveBeenCalled();
+        });
+    });
+
+    it('should return 404 NotFoundError if user not found', async () => {
+      mockUserService.editUser = jest
+        .fn()
+        .mockRejectedValue(new NotFoundError('User not found'));
+
+      await request(app)
+        .patch('/api/users/507f1f77bcf86cd799439011')
+        .send({ email: 'test@email.com' })
+        .expect((res) => {
+          expect(res.body).toHaveProperty('message');
+        })
+        .expect(404);
     });
   });
 });

@@ -76,6 +76,4 @@ export class UserController implements IUserController {
       next(error);
     }
   };
-
-  // TODO: remove password property from responses sent to the client
 }

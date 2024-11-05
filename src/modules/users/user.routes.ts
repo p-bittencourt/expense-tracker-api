@@ -24,6 +24,7 @@ export const createUserRouter = (userController: UserController) => {
   router.patch(
     '/:id',
     validateContentType,
+    sanitizeUserInput,
     validateDTO(UpdateUserDTO),
     userController.editUser
   );

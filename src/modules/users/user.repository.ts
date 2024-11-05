@@ -18,7 +18,11 @@ export class UserRepository implements IUserRepository {
       if (!user) throw new NotFoundError(`User with ID ${id} not found`);
       return user;
     } catch (error) {
-      handleDatabaseError(error, 'getUserId');
+      if (!(error instanceof NotFoundError)) {
+        handleDatabaseError(error, 'deleteUser');
+      } else {
+        throw error;
+      }
     }
   }
 
@@ -37,7 +41,11 @@ export class UserRepository implements IUserRepository {
       if (!user) throw new NotFoundError(`User not found`);
       return user;
     } catch (error) {
-      handleDatabaseError(error, 'deleteUser');
+      if (!(error instanceof NotFoundError)) {
+        handleDatabaseError(error, 'deleteUser');
+      } else {
+        throw error;
+      }
     }
   }
 
@@ -47,7 +55,11 @@ export class UserRepository implements IUserRepository {
       if (!user) throw new NotFoundError('User not found');
       return user;
     } catch (error) {
-      handleDatabaseError(error, 'editUser');
+      if (!(error instanceof NotFoundError)) {
+        handleDatabaseError(error, 'editUser');
+      } else {
+        throw error;
+      }
     }
   }
 }
@@ -59,7 +71,7 @@ function handleDatabaseError(error: any, operation: string): never {
   }
   // Log uknown error for debugging and monitoring
   console.error('Database error:', {
-    operation: 'createUser',
+    operation,
     error: error.message,
     stack: error.stack,
   });
