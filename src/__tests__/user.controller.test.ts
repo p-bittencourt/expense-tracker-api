@@ -6,14 +6,14 @@ import { UserController } from '@/modules/users/user.controller';
 import type { IUser } from '@/modules/users/user.model';
 import { CreateUserDTO } from '@/modules/users/user.dto';
 import { NotFoundError } from '@/types/errors';
+import type { Express } from 'express';
 
 // Mock the UserRepository and UserService
 jest.mock('@/modules/users/user.repository');
 jest.mock('@/modules/users/user.services');
 
 describe('User Controller', () => {
-  let app: any;
-  let server: any;
+  let app: Express;
   let mockUserRepository: jest.Mocked<UserRepository>;
   let mockUserService: jest.Mocked<UserService>;
   let userController: UserController;
@@ -25,20 +25,15 @@ describe('User Controller', () => {
       mockUserRepository
     ) as jest.Mocked<UserService>;
     userController = new UserController(mockUserService);
-
     // Create the app with our mocked controller
     app = createApp(userController);
-    server = app.listen(3001);
-
     // Mock console.error to suppress error logs during tests
     jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
-  afterAll((done) => {
+  afterAll(() => {
     // Restore console.error after testso
-    (console.error as jest.Mock).mockRestore();
-    // Clean up the server
-    server.close(done);
+    jest.spyOn(console, 'error').mockRestore();
   });
 
   beforeEach(() => {
@@ -47,6 +42,7 @@ describe('User Controller', () => {
   });
 
   describe('GET /api/users', () => {
+    // TODO: refactor get tests to use supertest's .expect()
     it('should retrieve an array of users', async () => {
       mockUserService.getAllUsers = jest.fn().mockResolvedValue([]);
 
@@ -114,11 +110,11 @@ describe('User Controller', () => {
       password: 'password123',
     };
 
-    it('should return 201 when user is successfully added', async () => {
+    it('should return 201 when user is successfully created', async () => {
       const mockUser: Partial<IUser> = {
         _id: '507f1f77bcf86cd799439011',
-        username: 'JohnDoe',
-        email: 'john@example.com',
+        username: validUser.username,
+        email: validUser.email,
         expenses: [],
       };
 
@@ -126,19 +122,42 @@ describe('User Controller', () => {
         .fn()
         .mockResolvedValue(mockUser as IUser);
 
-      const response = await request(app).post('/api/users/').send(validUser);
-
-      expect(response.status).toBe(201);
-      expect(response.body).toEqual(mockUser);
-      expect(mockUserService.createUser).toHaveBeenCalledWith(validUser);
+      await request(app)
+        .post('/api/users')
+        .send(validUser)
+        .expect(201)
+        .expect((res) => {
+          expect(res.body).toEqual(mockUser);
+          expect(mockUserService.createUser).toHaveBeenCalledWith(validUser);
+        });
     });
 
     it('should return 400 when request body is empty', async () => {
-      const response = await request(app).post('/api/users').send({});
+      await request(app)
+        .post('/api/users')
+        .send({})
+        .expect(400)
+        .expect((res) => {
+          expect(res.body).toHaveProperty('status', 'validation_error');
+          expect(res.body.message).toContain('required');
+        });
+    });
 
-      expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('status', 'validation_error');
-      expect(response.body.message).toContain('required');
+    it('should return 400 when required fields are missing', async () => {
+      const incompleteUser = {
+        username: 'John Doe',
+        // missing email and password
+      };
+
+      await request(app)
+        .post('/api/users')
+        .send(incompleteUser)
+        .expect(400)
+        .expect((res) => {
+          expect(res.body).toHaveProperty('status', 'validation_error');
+          expect(res.body.message).toContain('email');
+          expect(res.body.message).toContain('password');
+        });
     });
   });
 });
