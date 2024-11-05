@@ -18,7 +18,7 @@ export class UserController implements IUserController {
     }
   };
 
-  getSingleUser = async (
+  getUserById = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -60,9 +60,4 @@ export class UserController implements IUserController {
   ): Promise<void> => {
     throw new Error('Method not implemented');
   };
-
-  // TODO: unit test create user before implementing delete user
-  // TODO: test bad cases as well
-  // TODO: check that we can't create users without a mandatory field, or with an unexisting field
-  // TODO: study how to use mongodb-memory-server before further testing of db operations
 }

@@ -4,11 +4,11 @@ import User, { IUser } from './user.model';
 import { ConflictError, DatabaseError, NotFoundError } from '@/types/errors';
 
 export class UserRepository implements IUserRepository {
-  async findAll(): Promise<IUser[]> {
+  async getAllUsers(): Promise<IUser[]> {
     return await User.find().exec();
   }
 
-  async findById(id: string): Promise<IUser> {
+  async getUserById(id: string): Promise<IUser> {
     const user = await User.findById(id).exec();
     if (!user) throw new NotFoundError(`User with ID ${id} not found`);
     return user;

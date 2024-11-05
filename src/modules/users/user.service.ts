@@ -7,11 +7,11 @@ export class UserService implements IUserService {
   constructor(private userRepository: UserRepository) {}
 
   async getAllUsers(): Promise<IUser[]> {
-    return await this.userRepository.findAll();
+    return await this.userRepository.getAllUsers();
   }
 
   async getUserById(id: string): Promise<IUser> {
-    return await this.userRepository.findById(id);
+    return await this.userRepository.getUserById(id);
   }
 
   async createUser(userData: CreateUserDTO): Promise<IUser> {
@@ -22,10 +22,7 @@ export class UserService implements IUserService {
     throw new Error('Method not implemented.');
   }
 
-  async updateUser(
-    id: string,
-    userData: Partial<CreateUserDTO>
-  ): Promise<IUser> {
+  async editUser(id: string, userData: Partial<CreateUserDTO>): Promise<IUser> {
     throw new Error('Method not implemented.');
   }
 }
