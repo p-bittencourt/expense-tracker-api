@@ -28,8 +28,6 @@ describe('User Controller', () => {
 
     // Create the app with our mocked controller
     app = createApp(userController);
-
-    // Start the server
     server = app.listen(3001);
 
     // Mock console.error to suppress error logs during tests
@@ -61,7 +59,6 @@ describe('User Controller', () => {
 
   describe('GET /api/users/:id', () => {
     it('should return 404 when user is not found', async () => {
-      // Mock the getUserById method to return null
       mockUserService.getUserById = jest
         .fn()
         .mockRejectedValue(new NotFoundError('User not found'));
