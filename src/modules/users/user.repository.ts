@@ -1,5 +1,5 @@
 import { IUserRepository } from './interfaces/IUserRepository';
-import { CreateUserDTO } from './user.dto';
+import { CreateUserDTO, UserResponseDTO } from './user.dto';
 import User, { IUser } from './user.model';
 import { ConflictError, DatabaseError, NotFoundError } from '@/types/errors';
 
@@ -22,20 +22,20 @@ export class UserRepository implements IUserRepository {
     }
   }
 
-  async createUser(userData: CreateUserDTO): Promise<IUser> {
+  async createUser(userData: CreateUserDTO): Promise<UserResponseDTO> {
     try {
       const newUser = await User.create({ ...userData, expenses: [] });
-      return newUser;
+      return new UserResponseDTO(newUser);
     } catch (error) {
       handleDatabaseError(error, 'createUser');
     }
   }
 
-  async deleteUser(id: string): Promise<IUser> {
+  async deleteUser(id: string): Promise<UserResponseDTO> {
     try {
       const user = await User.findByIdAndDelete(id);
       if (!user) throw new NotFoundError(`User not found`);
-      return user;
+      return new UserResponseDTO(user);
     } catch (error) {
       handleDatabaseError(error, 'deleteUser');
     }

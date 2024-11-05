@@ -7,6 +7,8 @@ import {
   Matches,
   IsEmail,
 } from 'class-validator';
+import { IUser } from './user.model';
+import { ObjectId } from 'mongoose';
 
 export class CreateUserDTO {
   @IsString()
@@ -38,9 +40,7 @@ export class UpdateUserDTO {
 }
 
 export class UserResponseDTO {
-  @IsString()
-  @IsOptional()
-  id?: string;
+  id?: ObjectId;
   @IsString()
   @IsOptional()
   username?: string;
@@ -49,8 +49,16 @@ export class UserResponseDTO {
   email?: string;
   @IsNumber()
   @IsOptional()
-  expenseCount?: number;
+  expenses?: ObjectId[];
   @IsDate()
   @IsOptional()
   createdAt?: Date;
+
+  constructor(user: IUser) {
+    this.id = user.id;
+    this.username = user.username;
+    this.email = user.email;
+    this.expenses = user.expenses;
+    this.createdAt = user.createdAt;
+  }
 }

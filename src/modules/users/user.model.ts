@@ -13,6 +13,7 @@ const UserSchema: Schema = new Schema(
 
 //
 export interface IUser extends Document {
+  id: ObjectId;
   username: string;
   password: string;
   email: string;

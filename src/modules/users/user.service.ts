@@ -1,6 +1,6 @@
 import { UserRepository } from './user.repository';
 import type { IUser } from './user.model';
-import { CreateUserDTO } from './user.dto';
+import { CreateUserDTO, UserResponseDTO } from './user.dto';
 import { IUserService } from './interfaces/IUserServices';
 
 export class UserService implements IUserService {
@@ -14,11 +14,11 @@ export class UserService implements IUserService {
     return await this.userRepository.getUserById(id);
   }
 
-  async createUser(userData: CreateUserDTO): Promise<IUser> {
+  async createUser(userData: CreateUserDTO): Promise<UserResponseDTO> {
     return await this.userRepository.createUser(userData);
   }
 
-  async deleteUser(id: string): Promise<IUser> {
+  async deleteUser(id: string): Promise<UserResponseDTO> {
     return await this.userRepository.deleteUser(id);
   }
 
