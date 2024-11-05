@@ -15,11 +15,13 @@ export class UserService implements IUserService {
   }
 
   async createUser(userData: CreateUserDTO): Promise<UserResponseDTO> {
-    return await this.userRepository.createUser(userData);
+    const createdUser = await this.userRepository.createUser(userData);
+    return new UserResponseDTO(createdUser);
   }
 
   async deleteUser(id: string): Promise<UserResponseDTO> {
-    return await this.userRepository.deleteUser(id);
+    const deletedUser = await this.userRepository.deleteUser(id);
+    return new UserResponseDTO(deletedUser);
   }
 
   async editUser(id: string, userData: Partial<CreateUserDTO>): Promise<IUser> {
