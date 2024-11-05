@@ -108,13 +108,13 @@ describe('User Controller', () => {
   });
 
   describe('POST /api/users', () => {
-    it('should return 201 when user is successfully added', async () => {
-      const newUser: CreateUserDTO = {
-        username: 'JohnDoe',
-        email: 'john@example.com',
-        password: 'password1234',
-      };
+    const validUser: CreateUserDTO = {
+      username: 'JohnDoe',
+      email: 'john@example.com',
+      password: 'password123',
+    };
 
+    it('should return 201 when user is successfully added', async () => {
       const mockUser: Partial<IUser> = {
         _id: '507f1f77bcf86cd799439011',
         username: 'JohnDoe',
@@ -126,11 +126,19 @@ describe('User Controller', () => {
         .fn()
         .mockResolvedValue(mockUser as IUser);
 
-      const response = await request(app).post('/api/users/').send(newUser);
+      const response = await request(app).post('/api/users/').send(validUser);
 
       expect(response.status).toBe(201);
       expect(response.body).toEqual(mockUser);
-      expect(mockUserService.createUser).toHaveBeenCalledWith(newUser);
+      expect(mockUserService.createUser).toHaveBeenCalledWith(validUser);
+    });
+
+    it('should return 400 when request body is empty', async () => {
+      const response = await request(app).post('/api/users').send({});
+
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty('status', 'validation_error');
+      expect(response.body.message).toContain('required');
     });
   });
 });
