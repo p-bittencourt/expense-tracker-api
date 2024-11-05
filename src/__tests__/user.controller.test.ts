@@ -88,7 +88,7 @@ describe('User Controller', () => {
     it('should return a user when found', async () => {
       const mockUser: Partial<IUser> = {
         _id: '507f1f77bcf86cd799439011',
-        username: 'John Doe',
+        username: 'JohnDoe',
         email: 'john@example.com',
         expenses: [],
       };
@@ -110,14 +110,14 @@ describe('User Controller', () => {
   describe('POST /api/users', () => {
     it('should return 201 when user is successfully added', async () => {
       const newUser: CreateUserDTO = {
-        username: 'John Doe',
+        username: 'JohnDoe',
         email: 'john@example.com',
-        password: '1234',
+        password: 'password1234',
       };
 
       const mockUser: Partial<IUser> = {
         _id: '507f1f77bcf86cd799439011',
-        username: 'John Doe',
+        username: 'JohnDoe',
         email: 'john@example.com',
         expenses: [],
       };
