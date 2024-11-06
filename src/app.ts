@@ -36,10 +36,6 @@ export function initializeDependencies() {
   const expenseService = new ExpenseService(expenseRepository, userRepository);
   const expenseController = new ExpenseController(expenseService);
 
-  console.log('Dependencies initialized:', {
-    userController,
-    expenseController,
-  });
   return { userController, expenseController };
 }
 
