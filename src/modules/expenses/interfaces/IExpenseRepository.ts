@@ -4,7 +4,10 @@ import { IExpense } from '../expense.model';
 
 export interface IExpenseRepository {
   // CRUD operations
-  createExpense(expenseData: CreateExpenseDTO): Promise<IExpense>;
+  createExpense(
+    expenseData: CreateExpenseDTO,
+    userId: string
+  ): Promise<IExpense>;
   getExpenseById(id: string): Promise<IExpense>;
   deleteExpense(id: string): Promise<IExpense>;
   updateExpense(id: string, expenseData: UpdateExpenseDTO): Promise<IExpense>;

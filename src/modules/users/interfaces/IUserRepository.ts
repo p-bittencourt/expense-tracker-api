@@ -7,4 +7,6 @@ export interface IUserRepository {
   createUser(userData: CreateUserDTO): Promise<IUser>;
   deleteUser(id: string): Promise<IUser>;
   editUser(id: string, userData: UpdateUserDTO): Promise<IUser>;
+
+  // TODO: rename edit actions to update, to better fit industry standard
 }

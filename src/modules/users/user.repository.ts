@@ -1,7 +1,8 @@
 import { IUserRepository } from './interfaces/IUserRepository';
 import { CreateUserDTO, UpdateUserDTO } from './user.dto';
 import User, { IUser } from './user.model';
-import { ConflictError, DatabaseError, NotFoundError } from '@/types/errors';
+import { NotFoundError } from '@/types/errors';
+import { handleDatabaseError } from '@/util/handle-database-error';
 
 export class UserRepository implements IUserRepository {
   async getAllUsers(): Promise<IUser[]> {
@@ -62,19 +63,18 @@ export class UserRepository implements IUserRepository {
       }
     }
   }
-}
 
-function handleDatabaseError(error: any, operation: string): never {
-  if (error.code === 11000) {
-    const field = Object.keys(error.keyPattern);
-    throw new ConflictError(`A user with this ${field} already exists`);
+  async addExpenseToUser(userId: string, expenseId: string): Promise<IUser> {
+    try {
+      const user = await User.findByIdAndUpdate(
+        userId,
+        { $push: { expenses: expenseId } },
+        { new: true }
+      );
+      if (!user) throw new NotFoundError('User not found');
+      return user;
+    } catch (error) {
+      handleDatabaseError(error, 'addExpenseToUser');
+    }
   }
-  // Log uknown error for debugging and monitoring
-  console.error('Database error:', {
-    operation,
-    error: error.message,
-    stack: error.stack,
-  });
-
-  throw new DatabaseError(`An error occurred during ${operation}`);
 }
