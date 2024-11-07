@@ -7,12 +7,11 @@ import {
   sanitizeUserInput,
 } from '@/middleware/validation.middleware';
 import { CreateUserDTO, UpdateUserDTO } from './user.dto';
-import { requiresAuth } from 'express-openid-connect';
 
 export const createUserRouter = (userController: UserController) => {
   const router = Router();
 
-  router.get('/', requiresAuth(), userController.getAllUsers);
+  router.get('/', userController.getAllUsers);
   router.get('/:id', validateObjectId, userController.getUserById);
   router.post(
     '/',

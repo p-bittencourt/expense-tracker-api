@@ -31,16 +31,21 @@ export function createApp(
   app.use(express.json());
   app.use(morgan('dev'));
 
-  // Routes
-  app.use('/api/users', createUserRouter(userController));
-  app.use('/api/expenses', createExpenseRouter(expenseController));
-
+  // Public routes
   app.get('/', (req, res) => {
     res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
   });
+
+  // Private Routes
   app.get('/profile', requiresAuth(), (req, res) => {
     res.send(JSON.stringify(req.oidc.user));
   });
+  app.use('/api/users', requiresAuth(), createUserRouter(userController));
+  app.use(
+    '/api/expenses',
+    requiresAuth(),
+    createExpenseRouter(expenseController)
+  );
 
   // Error Handler
   app.use(errorHandler);
