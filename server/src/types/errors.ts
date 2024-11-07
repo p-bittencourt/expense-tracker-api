@@ -1,3 +1,13 @@
+enum HttpStatus {
+  BAD_REQUEST = 400,
+  UNAUTHORIZED = 401,
+  FORBIDDEN = 403,
+  NOT_FOUND = 404,
+  CONFLICT = 409,
+  INTERNAL_SERVER_ERROR = 500,
+  NOT_IMPLEMENTED = 501,
+}
+
 export class AppError extends Error {
   constructor(
     public statusCode: number,
@@ -12,23 +22,21 @@ export class AppError extends Error {
 
 export class NotImplementedError extends AppError {
   constructor(message: string) {
-    super(500, 'not_implemented', message);
-  }
-}
-
-export class AuthenticationError extends AppError {
-  constructor(message: string) {
-    super(400, 'authentication_error', message);
+    super(HttpStatus.NOT_IMPLEMENTED, 'not_implemented', message);
   }
 }
 
 export class UnauthorizedError extends AppError {
   constructor(message: string) {
-    super(403, 'forbidden_error', message);
+    super(HttpStatus.UNAUTHORIZED, 'authentication_error', message);
   }
 }
 
-// TODO: check appropriate codes for NotImplementedError and AuthenticationError
+export class ForbiddenError extends AppError {
+  constructor(message: string) {
+    super(HttpStatus.FORBIDDEN, 'forbidden_error', message);
+  }
+}
 
 export class NotFoundError extends AppError {
   constructor(message: string) {

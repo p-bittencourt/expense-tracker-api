@@ -2,7 +2,6 @@ import { UserRepository } from './user.repository';
 import type { IUser } from './user.model';
 import { CreateUserDTO, UpdateUserDTO, UserResponseDTO } from './user.dto';
 import { IUserService } from './interfaces/IUserServices';
-import { NotImplementedError } from '@/types/errors';
 
 export class UserService implements IUserService {
   constructor(private userRepository: UserRepository) {}
