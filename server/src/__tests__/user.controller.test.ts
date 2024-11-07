@@ -12,16 +12,24 @@ import {
 import { NotFoundError } from '@/types/errors';
 import type { Express } from 'express';
 import mongoose from 'mongoose';
+import { ExpenseRepository } from '@/modules/expenses/expense.repository';
+import { ExpenseService } from '@/modules/expenses/expense.service';
+import { ExpenseController } from '@/modules/expenses/expense.controller';
 
 // Mock the UserRepository and UserService
 jest.mock('@/modules/users/user.repository');
 jest.mock('@/modules/users/user.service');
+jest.mock('@/modules/expenses/expense.repository');
+jest.mock('@/modules/expenses/expense.service');
 
 describe('User Controller', () => {
   let app: Express;
   let mockUserRepository: jest.Mocked<UserRepository>;
   let mockUserService: jest.Mocked<UserService>;
+  let mockExpenseRepository: jest.Mocked<ExpenseRepository>;
+  let mockExpenseService: jest.Mocked<ExpenseService>;
   let userController: UserController;
+  let expenseController: ExpenseController;
 
   beforeAll(() => {
     // Create our mock instances
@@ -29,9 +37,16 @@ describe('User Controller', () => {
     mockUserService = new UserService(
       mockUserRepository
     ) as jest.Mocked<UserService>;
+    mockExpenseRepository =
+      new ExpenseRepository() as jest.Mocked<ExpenseRepository>;
+    mockExpenseService = new ExpenseService(
+      mockExpenseRepository,
+      mockUserRepository
+    ) as jest.Mocked<ExpenseService>;
     userController = new UserController(mockUserService);
-    // Create the app with our mocked controller
-    app = createApp(userController);
+    expenseController = new ExpenseController(mockExpenseService);
+    // Create the app with our mocked controllers
+    app = createApp(userController, expenseController);
     // Mock console.error to suppress error logs during tests
     jest.spyOn(console, 'error').mockImplementation(() => {});
   });
