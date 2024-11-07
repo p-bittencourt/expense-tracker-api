@@ -2,6 +2,7 @@ import { UserRepository } from './user.repository';
 import type { IUser } from './user.model';
 import { CreateUserDTO, UpdateUserDTO, UserResponseDTO } from './user.dto';
 import { IUserService } from './interfaces/IUserServices';
+import { NotImplementedError } from '@/types/errors';
 
 export class UserService implements IUserService {
   constructor(private userRepository: UserRepository) {}
@@ -30,5 +31,9 @@ export class UserService implements IUserService {
   ): Promise<UserResponseDTO> {
     const editedUser = await this.userRepository.editUser(id, userData);
     return new UserResponseDTO(editedUser);
+  }
+
+  async findByAuth0Id(auth0Id: string): Promise<IUser> {
+    throw new NotImplementedError('findByAuth0Id');
   }
 }

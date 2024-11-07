@@ -12,6 +12,9 @@ import { ObjectId } from 'mongoose';
 
 export class CreateUserDTO {
   @IsString()
+  auth0Id!: string;
+
+  @IsString()
   @MinLength(3, { message: 'Username must be at least 3 characters long' })
   @Matches(/^[a-zA-Z0-9_-]*$/, {
     message:
@@ -21,13 +24,6 @@ export class CreateUserDTO {
 
   @IsEmail({}, { message: 'Invalid email format' })
   email!: string;
-
-  @IsString()
-  @MinLength(8, { message: 'Password must be at least 9 characters long' })
-  @Matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, {
-    message: 'Password must contain at least one letter and one number',
-  })
-  password!: string;
 }
 
 export class UpdateUserDTO {
@@ -37,17 +33,11 @@ export class UpdateUserDTO {
   @IsOptional()
   @IsString()
   email?: string;
-  @IsString()
-  @MinLength(8, { message: 'Password must be at least 9 characters long' })
-  @Matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, {
-    message: 'Password must contain at least one letter and one number',
-  })
-  @IsOptional()
-  password?: string;
 }
 
 export class UserResponseDTO {
   id?: ObjectId;
+  auth0id?: string;
   @IsString()
   @IsOptional()
   username?: string;
@@ -63,6 +53,7 @@ export class UserResponseDTO {
 
   constructor(user: IUser) {
     this.id = user.id;
+    this.auth0id = user.auth0id;
     this.username = user.username;
     this.email = user.email;
     this.expenses = user.expenses;

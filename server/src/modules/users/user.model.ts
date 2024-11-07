@@ -3,9 +3,9 @@ import mongoose, { Schema, Document, ObjectId } from 'mongoose';
 // Define the User schema
 const UserSchema: Schema = new Schema(
   {
+    auth0Id: { type: String, required: true, unique: true },
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
     expenses: [{ type: Schema.Types.ObjectId, ref: 'Expenses' }],
   },
   { timestamps: true }
@@ -14,8 +14,8 @@ const UserSchema: Schema = new Schema(
 //
 export interface IUser extends Document {
   id: ObjectId;
+  auth0id: string;
   username: string;
-  password: string;
   email: string;
   expenses: ObjectId[];
   createdAt: Date;

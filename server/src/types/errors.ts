@@ -10,6 +10,20 @@ export class AppError extends Error {
   }
 }
 
+export class NotImplementedError extends AppError {
+  constructor(message: string) {
+    super(500, 'not_implemented', message);
+  }
+}
+
+export class AuthenticationError extends AppError {
+  constructor(message: string) {
+    super(400, 'authentication_error', message);
+  }
+}
+
+// TODO: check appropriate codes for NotImplementedError and AuthenticationError
+
 export class NotFoundError extends AppError {
   constructor(message: string) {
     super(404, 'not_found', message);
