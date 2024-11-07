@@ -10,19 +10,37 @@ import { ExpenseRepository } from './modules/expenses/expense.repository';
 import { ExpenseService } from './modules/expenses/expense.service';
 import { ExpenseController } from './modules/expenses/expense.controller';
 import { createExpenseRouter } from './modules/expenses/expense.routes';
+import { auth, requiresAuth } from 'express-openid-connect';
 
 export function createApp(
   userController: UserController,
   expenseController: ExpenseController
 ) {
   const app = express();
+  const config = {
+    authRequired: false,
+    auth0Logout: true,
+    baseURL: 'http://localhost:5000',
+    secret: process.env.SECRET,
+    clientID: process.env.CLIENT_ID,
+    issuerBaseURL: process.env.ISSUER_BASE_URL,
+  };
+
   // Middleware
+  app.use(auth(config));
   app.use(express.json());
   app.use(morgan('dev'));
 
   // Routes
   app.use('/api/users', createUserRouter(userController));
   app.use('/api/expenses', createExpenseRouter(expenseController));
+
+  app.get('/', (req, res) => {
+    res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
+  });
+  app.get('/profile', requiresAuth(), (req, res) => {
+    res.send(JSON.stringify(req.oidc.user));
+  });
 
   // Error Handler
   app.use(errorHandler);
