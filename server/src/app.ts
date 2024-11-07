@@ -11,9 +11,11 @@ import { ExpenseService } from './modules/expenses/expense.service';
 import { ExpenseController } from './modules/expenses/expense.controller';
 import { createExpenseRouter } from './modules/expenses/expense.routes';
 import { auth, requiresAuth } from 'express-openid-connect';
+import { linkAuth0User } from './middleware/auth.middleware';
 
 export function createApp(
   userController: UserController,
+  userService: UserService,
   expenseController: ExpenseController
 ) {
   const app = express();
@@ -30,6 +32,7 @@ export function createApp(
   app.use(auth(config));
   app.use(express.json());
   app.use(morgan('dev'));
+  app.use(linkAuth0User(userService));
 
   // Public routes
   app.get('/', (req, res) => {
@@ -61,11 +64,12 @@ export function initializeDependencies() {
   const expenseService = new ExpenseService(expenseRepository, userRepository);
   const expenseController = new ExpenseController(expenseService);
 
-  return { userController, expenseController };
+  return { userController, userService, expenseController };
 }
 
-const { userController, expenseController } = initializeDependencies();
-const app = createApp(userController, expenseController);
+const { userController, userService, expenseController } =
+  initializeDependencies();
+const app = createApp(userController, userService, expenseController);
 
 if (process.env.NODE_ENV !== 'test') {
   connectDB();

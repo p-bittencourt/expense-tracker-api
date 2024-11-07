@@ -1,3 +1,4 @@
+import { FilterQuery } from 'mongoose';
 import { IUserRepository } from './interfaces/IUserRepository';
 import { CreateUserDTO, UpdateUserDTO } from './user.dto';
 import User, { IUser } from './user.model';
@@ -64,6 +65,7 @@ export class UserRepository implements IUserRepository {
     }
   }
 
+  // TODO: this needs much testing after fixing relation mongodb user / auth user
   async addExpenseToUser(userId: string, expenseId: string): Promise<IUser> {
     try {
       const user = await User.findByIdAndUpdate(
@@ -75,6 +77,16 @@ export class UserRepository implements IUserRepository {
       return user;
     } catch (error) {
       handleDatabaseError(error, 'addExpenseToUser');
+    }
+  }
+
+  async findOne(query: FilterQuery<IUser>): Promise<IUser | null> {
+    try {
+      const user = await User.findOne(query);
+      if (!user) return null;
+      return user;
+    } catch (error) {
+      handleDatabaseError(error, 'findOne');
     }
   }
 }

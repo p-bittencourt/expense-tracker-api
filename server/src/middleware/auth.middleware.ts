@@ -10,20 +10,26 @@ export const linkAuth0User = (userService: UserService) => {
     }
 
     const auth0User = req.oidc.user;
-
+    console.log('Auth0 user: ', auth0User);
     if (!auth0User)
-      return new AuthenticationError('Auth0 user data not available');
+      return next(new AuthenticationError('Auth0 user data not available'));
 
     try {
-      const user = await userService.findByAuth0Id(auth0User.sub);
+      let user = await userService.findByAuth0Id(auth0User.sub);
 
       if (!user) {
+        console.log('Creating new user for: ' + auth0User.sub);
         const newUser: CreateUserDTO = {
           auth0Id: auth0User.sub,
           username: auth0User.nickname || auth0User.name,
           email: auth0User.email,
         };
+
+        user = await userService.createUser(newUser);
       }
+
+      console.log('Linked user: ' + user);
+      next();
     } catch (error) {
       next(error);
     }

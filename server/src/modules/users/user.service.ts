@@ -33,7 +33,11 @@ export class UserService implements IUserService {
     return new UserResponseDTO(editedUser);
   }
 
-  async findByAuth0Id(auth0Id: string): Promise<IUser> {
-    throw new NotImplementedError('findByAuth0Id');
+  async findByAuth0Id(auth0Id: string): Promise<UserResponseDTO | null> {
+    const user = await this.userRepository.findOne({ auth0Id });
+    if (!user) return null;
+    return new UserResponseDTO(user);
   }
+
+  // TODO: Add new functions to the interface
 }

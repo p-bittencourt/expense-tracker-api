@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { UserService } from './user.service';
 import { IUserController } from './interfaces/IUserController';
+import { UnauthorizedError } from '@/types/errors';
 
 export class UserController implements IUserController {
   constructor(private userService: UserService) {}
@@ -72,6 +73,30 @@ export class UserController implements IUserController {
         user,
         message: 'User succsessfully edited',
       });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getCurrentUser = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      if (!req.oidc.isAuthenticated()) {
+        return next(new UnauthorizedError('User not authenticated'));
+      }
+
+      const auth0User = req.oidc.user;
+      if (!auth0User) {
+        return next(new UnauthorizedError('Auth0 user data not available'));
+      }
+      const user = await this.userService.findByAuth0Id(auth0User.sub);
+      if (!user) {
+        return next(new UnauthorizedError('User not found'));
+      }
+      res.json(user);
     } catch (error) {
       next(error);
     }

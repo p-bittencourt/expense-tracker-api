@@ -37,7 +37,7 @@ export class UpdateUserDTO {
 
 export class UserResponseDTO {
   id?: ObjectId;
-  auth0id?: string;
+  auth0Id?: string;
   @IsString()
   @IsOptional()
   username?: string;
@@ -53,7 +53,7 @@ export class UserResponseDTO {
 
   constructor(user: IUser) {
     this.id = user.id;
-    this.auth0id = user.auth0id;
+    this.auth0Id = user.auth0Id;
     this.username = user.username;
     this.email = user.email;
     this.expenses = user.expenses;

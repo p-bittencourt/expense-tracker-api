@@ -22,6 +22,12 @@ export class AuthenticationError extends AppError {
   }
 }
 
+export class UnauthorizedError extends AppError {
+  constructor(message: string) {
+    super(403, 'forbidden_error', message);
+  }
+}
+
 // TODO: check appropriate codes for NotImplementedError and AuthenticationError
 
 export class NotFoundError extends AppError {

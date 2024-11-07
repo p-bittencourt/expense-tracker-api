@@ -14,7 +14,7 @@ const UserSchema: Schema = new Schema(
 //
 export interface IUser extends Document {
   id: ObjectId;
-  auth0id: string;
+  auth0Id: string;
   username: string;
   email: string;
   expenses: ObjectId[];
