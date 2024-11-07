@@ -1,5 +1,6 @@
 import express from 'express';
 import connectDB from './config/database';
+import morgan from 'morgan';
 import { errorHandler } from './middleware/error.middleware';
 import { createUserRouter } from './modules/users/user.routes';
 import { UserController } from './modules/users/user.controller';
@@ -17,6 +18,7 @@ export function createApp(
   const app = express();
   // Middleware
   app.use(express.json());
+  app.use(morgan('dev'));
 
   // Routes
   app.use('/api/users', createUserRouter(userController));
