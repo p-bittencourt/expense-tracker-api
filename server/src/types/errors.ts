@@ -40,24 +40,24 @@ export class ForbiddenError extends AppError {
 
 export class NotFoundError extends AppError {
   constructor(message: string) {
-    super(404, 'not_found', message);
+    super(HttpStatus.NOT_FOUND, 'not_found', message);
   }
 }
 
 export class ValidationError extends AppError {
   constructor(message: string) {
-    super(400, 'validation_error', message);
+    super(HttpStatus.BAD_REQUEST, 'validation_error', message);
   }
 }
 
 export class ConflictError extends AppError {
   constructor(message: string) {
-    super(409, 'conflict_error', message);
+    super(HttpStatus.CONFLICT, 'conflict_error', message);
   }
 }
 
 export class DatabaseError extends AppError {
   constructor(message: string) {
-    super(500, 'database_error', message);
+    super(HttpStatus.INTERNAL_SERVER_ERROR, 'database_error', message);
   }
 }

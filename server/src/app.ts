@@ -10,7 +10,7 @@ import { UserService } from './modules/users/user.service';
 import { ExpenseController } from './modules/expenses/expense.controller';
 import { createExpenseRouter } from './modules/expenses/expense.routes';
 import { auth, requiresAuth } from 'express-openid-connect';
-import { linkAuth0User } from './middleware/auth.middleware';
+import { devAuthBypass, linkAuth0User } from './middleware/auth.middleware';
 
 export function createApp(
   userController: UserController,
@@ -23,6 +23,9 @@ export function createApp(
   app.use(express.json());
   app.use(morgan('dev'));
   app.use(linkAuth0User(userService));
+
+  app.use(devAuthBypass); // Toggle to test authentication properly
+
   // Public routes
   app.get('/', (req, res) => {
     res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');

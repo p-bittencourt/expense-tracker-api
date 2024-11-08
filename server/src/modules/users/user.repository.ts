@@ -20,11 +20,7 @@ export class UserRepository implements IUserRepository {
       if (!user) throw new NotFoundError(`User with ID ${id} not found`);
       return user;
     } catch (error) {
-      if (!(error instanceof NotFoundError)) {
-        handleDatabaseError(error, 'deleteUser');
-      } else {
-        throw error;
-      }
+      handleDatabaseError(error, 'deleteUser');
     }
   }
 
