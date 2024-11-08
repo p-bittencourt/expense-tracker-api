@@ -12,7 +12,6 @@ export class UserController implements IUserController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      console.log(req.headers);
       const users = await this.userService.getAllUsers();
       res.json(users);
     } catch (error) {

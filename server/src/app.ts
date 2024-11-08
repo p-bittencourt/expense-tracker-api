@@ -15,11 +15,12 @@ import { devAuthBypass, linkAuth0User } from './middleware/auth.middleware';
 export function createApp(
   userController: UserController,
   userService: UserService,
-  expenseController: ExpenseController
+  expenseController: ExpenseController,
+  getAuthMiddleware = () => auth(authConfig)
 ) {
   const app = express();
   // Middleware
-  app.use(auth(authConfig));
+  app.use(getAuthMiddleware());
   app.use(express.json());
   app.use(morgan('dev'));
   app.use(linkAuth0User(userService));

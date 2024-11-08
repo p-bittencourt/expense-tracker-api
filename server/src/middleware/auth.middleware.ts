@@ -32,7 +32,10 @@ export const linkAuth0User = (userService: UserService) => {
 };
 
 export function devAuthBypass(req: Request, res: Response, next: NextFunction) {
-  if (process.env.NODE_ENV === 'development') {
+  if (
+    process.env.NODE_ENV === 'development' ||
+    process.env.NODE_ENV === 'test'
+  ) {
     req.oidc = {
       isAuthenticated: () => true,
       user: {
@@ -47,3 +50,19 @@ export function devAuthBypass(req: Request, res: Response, next: NextFunction) {
     next();
   }
 }
+
+export const mockAuth = (req: Request, res: Response, next: NextFunction) => {
+  // Mock an authenticated user object
+  req.oidc = {
+    isAuthenticated: () => true,
+    user: {
+      sub: 'auth0|672cb540fd0903177515f320',
+      email: 'email@example.com',
+    },
+    fetchUserInfo: async () => ({
+      sub: 'auth0|672cb540fd0903177515f320',
+      email: 'email@example.com',
+    }),
+  };
+  next();
+};

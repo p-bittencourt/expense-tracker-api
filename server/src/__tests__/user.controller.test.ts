@@ -15,6 +15,7 @@ import mongoose from 'mongoose';
 import { ExpenseRepository } from '@/modules/expenses/expense.repository';
 import { ExpenseService } from '@/modules/expenses/expense.service';
 import { ExpenseController } from '@/modules/expenses/expense.controller';
+import { mockAuth } from '@/middleware/auth.middleware';
 
 // Mock the UserRepository and UserService
 jest.mock('@/modules/users/user.repository');
@@ -46,7 +47,12 @@ describe('User Controller', () => {
     userController = new UserController(mockUserService);
     expenseController = new ExpenseController(mockExpenseService);
     // Create the app with our mocked controllers
-    app = createApp(userController, expenseController);
+    app = createApp(
+      userController,
+      mockUserService,
+      expenseController,
+      () => mockAuth
+    );
     // Mock console.error to suppress error logs during tests
     jest.spyOn(console, 'error').mockImplementation(() => {});
   });
@@ -132,7 +138,6 @@ describe('User Controller', () => {
     const validUser: CreateUserDTO = {
       username: 'JohnDoe',
       email: 'john@example.com',
-      password: 'password123',
     };
 
     it('should return 201 when user is successfully created', async () => {
@@ -171,7 +176,7 @@ describe('User Controller', () => {
     it('should return 400 when required fields are missing', async () => {
       const incompleteUser = {
         username: 'John Doe',
-        // missing email and password
+        // missing email
       };
 
       await request(app)
@@ -181,7 +186,6 @@ describe('User Controller', () => {
         .expect((res) => {
           expect(res.body).toHaveProperty('status', 'validation_error');
           expect(res.body.message).toContain('email');
-          expect(res.body.message).toContain('password');
         });
     });
   });
