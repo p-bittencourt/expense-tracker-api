@@ -17,7 +17,6 @@ export const linkAuth0User = (userService: UserService) => {
     try {
       let user = await userService.findByAuth0Id(auth0User.sub);
       const allUsers = await userService.getAllUsers();
-      console.log(allUsers);
 
       if (!user) {
         const newUser: CreateUserDTO = {
@@ -28,7 +27,6 @@ export const linkAuth0User = (userService: UserService) => {
         };
         user = await userService.createUser(newUser);
       }
-      console.log(user);
       next();
     } catch (error) {
       next(error);

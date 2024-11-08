@@ -68,6 +68,7 @@ export class UserResponseDTO {
     this.auth0Id = user.auth0Id;
     this.username = user.username;
     this.email = user.email;
+    this.role = user.role;
     this.expenses = user.expenses;
     this.createdAt = user.createdAt;
   }
