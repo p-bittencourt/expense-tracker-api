@@ -2,6 +2,7 @@ import mongoose, { Schema, Document, ObjectId } from 'mongoose';
 export enum Roles {
   USER = 'USER',
   ADMIN = 'ADMIN',
+  DEPENDENT = 'DEPENDENT',
 }
 
 // Define the User schema
