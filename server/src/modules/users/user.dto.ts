@@ -6,8 +6,10 @@ import {
   MinLength,
   Matches,
   IsEmail,
+  IsEnum,
 } from 'class-validator';
 import { IUser } from './user.model';
+import { Roles } from './user.model';
 import { ObjectId } from 'mongoose';
 
 export class CreateUserDTO {
@@ -24,6 +26,10 @@ export class CreateUserDTO {
 
   @IsEmail({}, { message: 'Invalid email format' })
   email!: string;
+
+  @IsOptional()
+  @IsEnum(Roles, { message: 'Role must be either USER or ADMIN' })
+  role?: Roles;
 }
 
 export class UpdateUserDTO {
@@ -33,6 +39,9 @@ export class UpdateUserDTO {
   @IsOptional()
   @IsString()
   email?: string;
+  @IsOptional()
+  @IsString()
+  roles?: Roles;
 }
 
 export class UserResponseDTO {
@@ -44,6 +53,9 @@ export class UserResponseDTO {
   @IsString()
   @IsOptional()
   email?: string;
+  @IsEnum(Roles)
+  @IsOptional()
+  role?: string;
   @IsNumber()
   @IsOptional()
   expenses?: ObjectId[];

@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { UserService } from '@/modules/users/user.service';
 import { CreateUserDTO } from '@/modules/users/user.dto';
 import { UnauthorizedError } from '@/types/errors';
+import { Roles } from '@/modules/users/user.model';
 
 export const linkAuth0User = (userService: UserService) => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -15,15 +16,19 @@ export const linkAuth0User = (userService: UserService) => {
 
     try {
       let user = await userService.findByAuth0Id(auth0User.sub);
+      const allUsers = await userService.getAllUsers();
+      console.log(allUsers);
 
       if (!user) {
         const newUser: CreateUserDTO = {
           auth0Id: auth0User.sub,
           username: auth0User.nickname || auth0User.name,
           email: auth0User.email,
+          role: allUsers.length < 1 ? Roles.ADMIN : Roles.USER,
         };
         user = await userService.createUser(newUser);
       }
+      console.log(user);
       next();
     } catch (error) {
       next(error);

@@ -25,7 +25,8 @@ export function createApp(
   app.use(morgan('dev'));
   app.use(linkAuth0User(userService));
 
-  app.use(devAuthBypass); // Toggle to test authentication properly
+  // Toggle to test authentication properly, when active supplies test-user data to allow postman requests
+  // app.use(devAuthBypass);
 
   // Public routes
   app.get('/', (req, res) => {
