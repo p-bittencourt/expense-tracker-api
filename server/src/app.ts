@@ -10,11 +10,18 @@ import { UserService } from './modules/users/user.service';
 import { ExpenseController } from './modules/expenses/expense.controller';
 import { createExpenseRouter } from './modules/expenses/expense.routes';
 import { auth, requiresAuth } from 'express-openid-connect';
-import { devAuthBypass, linkAuth0User } from './middleware/auth.middleware';
+import {
+  checkUserRole,
+  devAuthBypass,
+  linkAuth0User,
+} from './middleware/auth.middleware';
+import { AdminUserController } from './modules/admin/admin.controller';
+import { AdminUserService } from './modules/admin/admin.service';
+import { createAdminUserRouter } from './modules/admin/admin.routes';
 
 export function createApp(
-  userController: UserController,
-  userService: UserService,
+  adminUserController: AdminUserController,
+  adminUserService: AdminUserService,
   expenseController: ExpenseController,
   getAuthMiddleware = () => auth(authConfig)
 ) {
@@ -23,7 +30,7 @@ export function createApp(
   app.use(getAuthMiddleware());
   app.use(express.json());
   app.use(morgan('dev'));
-  app.use(linkAuth0User(userService));
+  app.use(linkAuth0User(adminUserService));
 
   // Toggle to test authentication properly, when active supplies test-user data to allow postman requests
   // app.use(devAuthBypass);
@@ -36,9 +43,14 @@ export function createApp(
   app.get('/profile', requiresAuth(), (req, res) => {
     res.send(JSON.stringify(req.oidc.user));
   });
-  app.use('/api/users', requiresAuth(), createUserRouter(userController));
   app.use(
-    '/api/expenses',
+    '/api/v1/users',
+    requiresAuth(),
+    checkUserRole(adminUserService),
+    createAdminUserRouter(adminUserController)
+  );
+  app.use(
+    '/api/v1/expenses',
     requiresAuth(),
     createExpenseRouter(expenseController)
   );
@@ -48,9 +60,9 @@ export function createApp(
 }
 
 // Dependencies
-const { userController, userService, expenseController } =
+const { adminUserController, adminUserService, expenseController } =
   initializeDependencies();
-const app = createApp(userController, userService, expenseController);
+const app = createApp(adminUserController, adminUserService, expenseController);
 
 if (process.env.NODE_ENV !== 'test') {
   connectDB();
