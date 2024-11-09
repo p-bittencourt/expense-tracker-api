@@ -1,11 +1,10 @@
 import { UserRepository } from './user.repository';
-import type { IUser } from './user.model';
-import { CreateUserDTO, UpdateUserDTO, UserResponseDTO } from './user.dto';
 import { IUserService } from './interfaces/IUserServices';
 
 export class UserService implements IUserService {
   constructor(private userRepository: UserRepository) {}
 
+  /*
   async getAllUsers(): Promise<IUser[]> {
     return await this.userRepository.getAllUsers();
   }
@@ -37,6 +36,6 @@ export class UserService implements IUserService {
     if (!user) return null;
     return new UserResponseDTO(user);
   }
-
+  */
   // TODO: Add new functions to the interface
 }

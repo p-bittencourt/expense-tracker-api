@@ -1,18 +1,18 @@
 import { Request, Response, NextFunction } from 'express';
-import { UserService } from './user.service';
-import { IUserController } from './interfaces/IUserController';
-import { UnauthorizedError } from '@/types/errors';
+import { AdminUserService } from './admin.service';
+import { IAdminUserController } from './interfaces/IAdminUserController';
+import { NotFoundError, UnauthorizedError } from '@/types/errors';
 
-export class UserController implements IUserController {
-  constructor(private userService: UserService) {}
-  /*
+export class AdminUserController implements IAdminUserController {
+  constructor(private adminUserService: AdminUserService) {}
+
   getAllUsers = async (
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> => {
     try {
-      const users = await this.userService.getAllUsers();
+      const users = await this.adminUserService.getAllUsers();
       res.json(users);
     } catch (error) {
       next(error);
@@ -25,8 +25,7 @@ export class UserController implements IUserController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const id: string = req.params.id;
-      const user = await this.userService.getUserById(id);
+      const user = await this.adminUserService.getUserById(req.params.id);
       res.json(user);
     } catch (error) {
       next(error);
@@ -39,7 +38,7 @@ export class UserController implements IUserController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const user = await this.userService.createUser(req.body);
+      const user = await this.adminUserService.createUser(req.body);
       res.status(201).json(user);
     } catch (error) {
       next(error);
@@ -52,7 +51,7 @@ export class UserController implements IUserController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const user = await this.userService.deleteUser(req.params.id);
+      const user = await this.adminUserService.deleteUser(req.params.id);
       res.status(200).json({
         user,
         message: 'User successfully deleted',
@@ -62,13 +61,16 @@ export class UserController implements IUserController {
     }
   };
 
-  editUser = async (
+  updateUser = async (
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> => {
     try {
-      const user = await this.userService.editUser(req.params.id, req.body);
+      const user = await this.adminUserService.updateUser(
+        req.params.id,
+        req.body
+      );
       res.status(200).json({
         user,
         message: 'User successfully edited',
@@ -92,13 +94,14 @@ export class UserController implements IUserController {
       if (!auth0User) {
         return next(new UnauthorizedError('Auth0 user data not available'));
       }
-      const user = await this.userService.findByAuth0Id(auth0User.sub);
+
+      const user = await this.adminUserService.getUserByAuth0Id(auth0User.sub);
       if (!user) {
-        return next(new UnauthorizedError('User not found'));
+        return next(new NotFoundError('User not found'));
       }
       res.json(user);
     } catch (error) {
       next(error);
     }
-  }; */
+  };
 }

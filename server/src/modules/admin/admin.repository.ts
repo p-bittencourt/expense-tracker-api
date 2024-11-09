@@ -1,7 +1,7 @@
 import { FilterQuery } from 'mongoose';
 import { NotFoundError } from '@/types/errors';
 import { handleDatabaseError } from '@/util/handle-database-error';
-import { IAdminUserRepository } from './IAdminUserRepository';
+import { IAdminUserRepository } from './interfaces/IAdminUserRepository';
 import User, { IUser } from '../users/user.model';
 import { CreateUserDTO, UpdateUserDTO } from '../users/user.dto';
 
@@ -51,7 +51,7 @@ export class AdminUserRepository implements IAdminUserRepository {
     }
   }
 
-  async editUser(id: string, userData: UpdateUserDTO): Promise<IUser> {
+  async updateUser(id: string, userData: UpdateUserDTO): Promise<IUser> {
     try {
       const user = await User.findByIdAndUpdate(id, userData, { new: true });
       if (!user) throw new NotFoundError('User not found');
