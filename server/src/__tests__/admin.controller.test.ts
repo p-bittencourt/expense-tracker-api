@@ -15,7 +15,7 @@ import mongoose from 'mongoose';
 import { ExpenseRepository } from '@/modules/expenses/expense.repository';
 import { ExpenseService } from '@/modules/expenses/expense.service';
 import { ExpenseController } from '@/modules/expenses/expense.controller';
-import { mockAuth } from '@/middleware/auth.middleware';
+import { mockAuth, mockCheckUserRole } from '@/middleware/auth.middleware';
 import { UserRepository } from '@/modules/users/user.repository';
 
 // Mock the UserRepository and UserService
@@ -55,7 +55,8 @@ describe('AdminUser Controller', () => {
       adminUserController,
       mockAdminUserService,
       expenseController,
-      () => mockAuth
+      () => mockAuth,
+      mockCheckUserRole
     );
     // Mock console.error to suppress error logs during tests
     jest.spyOn(console, 'error').mockImplementation(() => {});
