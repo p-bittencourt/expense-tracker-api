@@ -14,8 +14,6 @@ export const linkAuth0User = (adminUserService: AdminUserService) => {
     if (!auth0User)
       return next(new UnauthorizedError('Auth0 user data not available'));
 
-    console.log(auth0User);
-
     try {
       let user = await adminUserService.getUserByAuth0Id(auth0User.sub);
       const allUsers = await adminUserService.getAllUsers();
@@ -74,14 +72,21 @@ export const mockAuth = (req: Request, res: Response, next: NextFunction) => {
 
 export const checkUserRole = (adminUserService: AdminUserService) => {
   return async (req: Request, res: Response, next: NextFunction) => {
+    console.log('in check user role');
     const auth0User = req.oidc.user;
     if (!auth0User)
       return next(new UnauthorizedError('Auth0 user data not available'));
 
     const user = await adminUserService.getUserByAuth0Id(auth0User.sub);
+    if (!user || user.role != 'ADMIN')
+      return next(new UnauthorizedError('Admin only'));
 
-    if (!user) return next(new UnauthorizedError('Admin only'));
+    next();
+  };
+};
 
+export const mockCheckUserRole = () => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     next();
   };
 };

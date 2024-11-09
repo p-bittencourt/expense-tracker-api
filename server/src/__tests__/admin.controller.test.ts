@@ -1,8 +1,8 @@
 import request from 'supertest';
 import { createApp } from '@/app';
-import { UserRepository } from '@/modules/users/user.repository';
-import { UserService } from '@/modules/users/user.service';
-import { UserController } from '@/modules/users/user.controller';
+import { AdminUserRepository } from '@/modules/admin/admin.repository';
+import { AdminUserService } from '@/modules/admin/admin.service';
+import { AdminUserController } from '@/modules/admin/admin.controller';
 import type { IUser } from '@/modules/users/user.model';
 import {
   CreateUserDTO,
@@ -16,40 +16,44 @@ import { ExpenseRepository } from '@/modules/expenses/expense.repository';
 import { ExpenseService } from '@/modules/expenses/expense.service';
 import { ExpenseController } from '@/modules/expenses/expense.controller';
 import { mockAuth } from '@/middleware/auth.middleware';
+import { UserRepository } from '@/modules/users/user.repository';
 
 // Mock the UserRepository and UserService
-jest.mock('@/modules/users/user.repository');
-jest.mock('@/modules/users/user.service');
+jest.mock('@/modules/admin/admin.repository');
+jest.mock('@/modules/admin/admin.service');
 jest.mock('@/modules/expenses/expense.repository');
 jest.mock('@/modules/expenses/expense.service');
 
-describe('User Controller', () => {
+describe('AdminUser Controller', () => {
   let app: Express;
   let mockUserRepository: jest.Mocked<UserRepository>;
-  let mockUserService: jest.Mocked<UserService>;
+  let mockAdminUserRepository: jest.Mocked<AdminUserRepository>;
+  let mockAdminUserService: jest.Mocked<AdminUserService>;
   let mockExpenseRepository: jest.Mocked<ExpenseRepository>;
   let mockExpenseService: jest.Mocked<ExpenseService>;
-  let userController: UserController;
+  let adminUserController: AdminUserController;
   let expenseController: ExpenseController;
 
   beforeAll(() => {
     // Create our mock instances
     mockUserRepository = new UserRepository() as jest.Mocked<UserRepository>;
-    mockUserService = new UserService(
-      mockUserRepository
-    ) as jest.Mocked<UserService>;
+    mockAdminUserRepository =
+      new AdminUserRepository() as jest.Mocked<AdminUserRepository>;
+    mockAdminUserService = new AdminUserService(
+      mockAdminUserRepository
+    ) as jest.Mocked<AdminUserService>;
     mockExpenseRepository =
       new ExpenseRepository() as jest.Mocked<ExpenseRepository>;
     mockExpenseService = new ExpenseService(
       mockExpenseRepository,
       mockUserRepository
     ) as jest.Mocked<ExpenseService>;
-    userController = new UserController(mockUserService);
+    adminUserController = new AdminUserController(mockAdminUserService);
     expenseController = new ExpenseController(mockExpenseService);
     // Create the app with our mocked controllers
     app = createApp(
-      userController,
-      mockUserService,
+      adminUserController,
+      mockAdminUserService,
       expenseController,
       () => mockAuth
     );
@@ -68,13 +72,13 @@ describe('User Controller', () => {
     jest.clearAllMocks();
   });
 
-  describe('GET /api/users', () => {
+  describe('GET /api/v1/users', () => {
     // TODO: refactor get tests to use supertest's .expect()
     it('should retrieve an array of users', async () => {
-      mockUserService.getAllUsers = jest.fn().mockResolvedValue([]);
+      mockAdminUserService.getAllUsers = jest.fn().mockResolvedValue([]);
 
       await request(app)
-        .get('/api/users')
+        .get('/api/v1/users')
         .expect(200)
         .expect((res) => {
           expect(res.body).toBeInstanceOf(Array);
@@ -82,17 +86,17 @@ describe('User Controller', () => {
     });
   });
 
-  describe('GET /api/users/:id', () => {
+  describe('GET /api/v1/users/:id', () => {
     it('should return 404 when user is not found', async () => {
-      mockUserService.getUserById = jest
+      mockAdminUserService.getUserById = jest
         .fn()
         .mockRejectedValue(new NotFoundError('User not found'));
 
       await request(app)
-        .get('/api/users/507f1f77bcf86cd799439011')
+        .get('/api/v1/users/507f1f77bcf86cd799439011')
         .expect(404)
         .expect((res) => {
-          expect(mockUserService.getUserById).toHaveBeenCalled();
+          expect(mockAdminUserService.getUserById).toHaveBeenCalled();
           expect(res.body).toEqual({
             message: 'User not found',
             status: 'not_found',
@@ -102,7 +106,7 @@ describe('User Controller', () => {
 
     it('should return 400 for invalid ID format', async () => {
       await request(app)
-        .get('/api/users/invalid-id')
+        .get('/api/v1/users/invalid-id')
         .expect(400)
         .expect((res) => {
           expect(res.body).toEqual({
@@ -120,21 +124,21 @@ describe('User Controller', () => {
         expenses: [],
       };
 
-      mockUserService.getUserById = jest
+      mockAdminUserService.getUserById = jest
         .fn()
         .mockResolvedValue(mockUser as IUser);
 
       await request(app)
-        .get('/api/users/507f1f77bcf86cd799439011')
+        .get('/api/v1/users/507f1f77bcf86cd799439011')
         .expect(200)
         .expect((res) => {
-          expect(mockUserService.getUserById).toHaveBeenCalled();
+          expect(mockAdminUserService.getUserById).toHaveBeenCalled();
           expect(res.body).toEqual(mockUser);
         });
     });
   });
 
-  describe('POST /api/users', () => {
+  describe('POST /api/v1/users', () => {
     const validUser: CreateUserDTO = {
       auth0Id: 'auth0|1234567890',
       username: 'JohnDoe',
@@ -150,23 +154,25 @@ describe('User Controller', () => {
         expenses: [],
       };
 
-      mockUserService.createUser = jest
+      mockAdminUserService.createUser = jest
         .fn()
         .mockResolvedValue(mockUser as IUser);
 
       await request(app)
-        .post('/api/users')
+        .post('/api/v1/users')
         .send(validUser)
         .expect(201)
         .expect((res) => {
           expect(res.body).toEqual(mockUser);
-          expect(mockUserService.createUser).toHaveBeenCalledWith(validUser);
+          expect(mockAdminUserService.createUser).toHaveBeenCalledWith(
+            validUser
+          );
         });
     });
 
     it('should return 400 when request body is empty', async () => {
       await request(app)
-        .post('/api/users')
+        .post('/api/v1/users')
         .send({})
         .expect(400)
         .expect((res) => {
@@ -182,7 +188,7 @@ describe('User Controller', () => {
       };
 
       await request(app)
-        .post('/api/users')
+        .post('/api/v1/users')
         .send(incompleteUser)
         .expect(400)
         .expect((res) => {
@@ -194,12 +200,12 @@ describe('User Controller', () => {
 
   describe('DELETE /api/users/:id', () => {
     it('should return 404 NotFoundError if user not found', async () => {
-      mockUserService.deleteUser = jest
+      mockAdminUserService.deleteUser = jest
         .fn()
         .mockRejectedValue(new NotFoundError('User not found'));
 
       await request(app)
-        .delete('/api/users/507f1f77bcf86cd799439011')
+        .delete('/api/v1/users/507f1f77bcf86cd799439011')
         .expect(404)
         .expect((res) => {
           expect(res.body).toHaveProperty('message');
@@ -215,10 +221,10 @@ describe('User Controller', () => {
         expenses: [],
       };
 
-      mockUserService.deleteUser = jest.fn().mockResolvedValue(mockUser);
+      mockAdminUserService.deleteUser = jest.fn().mockResolvedValue(mockUser);
 
       await request(app)
-        .delete('/api/users/507f1f77bcf86cd799439011')
+        .delete('/api/v1/users/507f1f77bcf86cd799439011')
         .expect(200)
         .expect((res) => {
           expect(res.body).toHaveProperty('user', mockUser);
@@ -230,7 +236,7 @@ describe('User Controller', () => {
     });
   });
 
-  describe('PATCH /api/users/:id', () => {
+  describe('PATCH /api/v1/users/:id', () => {
     it('should successfully update an user', async () => {
       const mockUser: Partial<IUser> = {
         _id: '507f1f77bcf86cd799439011',
@@ -239,25 +245,25 @@ describe('User Controller', () => {
         email: 'janedoe@email.com',
         expenses: [],
       };
-      mockUserService.editUser = jest.fn().mockResolvedValue(mockUser);
+      mockAdminUserService.updateUser = jest.fn().mockResolvedValue(mockUser);
 
       await request(app)
-        .patch('/api/users/507f1f77bcf86cd799439011')
+        .patch('/api/v1/users/507f1f77bcf86cd799439011')
         .send({ email: 'janedoe@email.com' })
         .expect(200)
         .expect((res) => {
           expect(res.body.user.email).toEqual(mockUser.email);
-          expect(mockUserService.editUser).toHaveBeenCalled();
+          expect(mockAdminUserService.updateUser).toHaveBeenCalled();
         });
     });
 
     it('should return 404 NotFoundError if user not found', async () => {
-      mockUserService.editUser = jest
+      mockAdminUserService.updateUser = jest
         .fn()
         .mockRejectedValue(new NotFoundError('User not found'));
 
       await request(app)
-        .patch('/api/users/507f1f77bcf86cd799439011')
+        .patch('/api/v1/users/507f1f77bcf86cd799439011')
         .send({ email: 'test@email.com' })
         .expect((res) => {
           expect(res.body).toHaveProperty('message');

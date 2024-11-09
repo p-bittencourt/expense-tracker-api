@@ -3,6 +3,9 @@ import { AdminUserService } from './admin.service';
 import { IAdminUserController } from './interfaces/IAdminUserController';
 import { NotFoundError, UnauthorizedError } from '@/types/errors';
 
+// TODO: Rerun tests after implementing admin user
+// Try adding a new non-admin user
+
 export class AdminUserController implements IAdminUserController {
   constructor(private adminUserService: AdminUserService) {}
 

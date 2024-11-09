@@ -23,7 +23,8 @@ export function createApp(
   adminUserController: AdminUserController,
   adminUserService: AdminUserService,
   expenseController: ExpenseController,
-  getAuthMiddleware = () => auth(authConfig)
+  getAuthMiddleware = () => auth(authConfig),
+  getCheckUserRole = () => checkUserRole(adminUserService)
 ) {
   const app = express();
   // Middleware
@@ -46,7 +47,7 @@ export function createApp(
   app.use(
     '/api/v1/users',
     requiresAuth(),
-    checkUserRole(adminUserService),
+    getCheckUserRole(),
     createAdminUserRouter(adminUserController)
   );
   app.use(
