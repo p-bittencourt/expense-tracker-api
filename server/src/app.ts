@@ -11,6 +11,7 @@ import { createExpenseRouter } from './modules/expenses/expense.routes';
 import { auth, requiresAuth } from 'express-openid-connect';
 import {
   attachCurrentUser,
+  attachTestUser,
   checkUserRole,
   devAuthBypass,
   linkAuth0User,
@@ -50,13 +51,13 @@ export function createApp(
   });
   app.use(
     '/home',
-    requiresAuth(),
+    // requiresAuth(), // comment out for testing
     getAttachCurrentUser(),
     createUserRouter(userController)
   );
   app.use(
     '/api/v1/admin',
-    requiresAuth(),
+    // requiresAuth(), // comment out for testing
     getCheckUserRole(),
     createAdminUserRouter(adminUserController)
   );
@@ -84,7 +85,10 @@ const app = createApp(
   adminUserController,
   adminUserService,
   userController,
-  expenseController
+  expenseController,
+  undefined,
+  undefined,
+  () => attachTestUser(adminUserRepository)
 );
 
 if (process.env.NODE_ENV !== 'test') {

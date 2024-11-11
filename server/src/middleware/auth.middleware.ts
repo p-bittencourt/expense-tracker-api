@@ -143,6 +143,22 @@ export const attachCurrentUser = (adminUserRepository: AdminUserRepository) => {
   };
 };
 
+export const attachTestUser = (adminUserRepository: AdminUserRepository) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const testUserAuth0Id = 'auth0|67324324b3734a0a45c520c6';
+    const user = await adminUserRepository.findOne({
+      auth0Id: testUserAuth0Id,
+    });
+
+    try {
+      res.locals.user = user;
+      next();
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
 export const mockAttachCurrentUser = () => {
   return async (req: Request, res: Response, next: NextFunction) => {
     res.locals.user = {
