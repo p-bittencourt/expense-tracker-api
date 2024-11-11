@@ -8,7 +8,7 @@ export enum Roles {
 // Define the User schema
 const UserSchema: Schema = new Schema(
   {
-    auth0Id: { type: String, required: true, unique: true },
+    auth0Id: { type: String, unique: true },
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     role: { type: String, enum: Roles, default: Roles.USER },

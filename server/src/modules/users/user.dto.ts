@@ -14,7 +14,8 @@ import { ObjectId } from 'mongoose';
 
 export class CreateUserDTO {
   @IsString()
-  auth0Id!: string;
+  @IsOptional()
+  auth0Id?: string;
 
   @IsString()
   @MinLength(3, { message: 'Username must be at least 3 characters long' })
@@ -33,6 +34,9 @@ export class CreateUserDTO {
 }
 
 export class UpdateUserDTO {
+  @IsString()
+  @IsOptional()
+  auth0Id?: string;
   @IsString()
   @IsOptional()
   username?: string;

@@ -34,7 +34,7 @@ export function createApp(
   app.use(linkAuth0User(adminUserService));
 
   // Toggle to test authentication properly, when active supplies test-user data to allow postman requests
-  // app.use(devAuthBypass);
+  app.use(devAuthBypass);
 
   // Public routes
   app.get('/', (req, res) => {

@@ -1,6 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { CreateUserDTO } from '@/modules/users/user.dto';
-import { UnauthorizedError } from '@/types/errors';
+import {
+  CreateUserDTO,
+  UpdateUserDTO,
+  UserResponseDTO,
+} from '@/modules/users/user.dto';
+import { UnauthorizedError, ValidationError } from '@/types/errors';
 import { Roles } from '@/modules/users/user.model';
 import { AdminUserService } from '@/modules/admin/admin.service';
 
@@ -13,11 +17,12 @@ export const linkAuth0User = (adminUserService: AdminUserService) => {
     const auth0User = req.oidc.user;
     if (!auth0User)
       return next(new UnauthorizedError('Auth0 user data not available'));
+    console.log(auth0User);
 
     try {
-      let user = await adminUserService.getUserByAuth0Id(auth0User.sub);
+      let user = await findUser(adminUserService, auth0User);
       const allUsers = await adminUserService.getAllUsers();
-
+      console.log(user);
       if (!user) {
         const newUser: CreateUserDTO = {
           auth0Id: auth0User.sub,
@@ -27,12 +32,36 @@ export const linkAuth0User = (adminUserService: AdminUserService) => {
         };
         user = await adminUserService.createUser(newUser);
       }
+
+      if (user && !user.auth0Id) {
+        const userId = user.id;
+        if (!userId) {
+          return next(new ValidationError('User ID is undefined'));
+        }
+        const updateUser: UpdateUserDTO = {
+          auth0Id: auth0User.sub,
+        };
+
+        user = await adminUserService.updateUser(userId.toString(), updateUser);
+      }
+
+      console.log(user);
       next();
     } catch (error) {
       next(error);
     }
   };
 };
+
+async function findUser(
+  adminUserService: AdminUserService,
+  auth0User: Record<string, any>
+): Promise<UserResponseDTO | null> {
+  let user = await adminUserService.getUserByAuth0Id(auth0User.sub);
+  if (user) return user;
+  user = await adminUserService.getUserByEmail(auth0User.email);
+  return user;
+}
 
 export function devAuthBypass(req: Request, res: Response, next: NextFunction) {
   if (
@@ -78,7 +107,7 @@ export const checkUserRole = (adminUserService: AdminUserService) => {
       return next(new UnauthorizedError('Auth0 user data not available'));
 
     const user = await adminUserService.getUserByAuth0Id(auth0User.sub);
-    if (!user || user.role != 'ADMIN')
+    if (!user || user.role !== 'ADMIN')
       return next(new UnauthorizedError('Admin only'));
 
     next();
