@@ -45,7 +45,7 @@ export function createApp(
     res.send(JSON.stringify(req.oidc.user));
   });
   app.use(
-    '/api/v1/users',
+    '/api/v1/admin',
     requiresAuth(),
     getCheckUserRole(),
     createAdminUserRouter(adminUserController)
