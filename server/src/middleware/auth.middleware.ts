@@ -136,7 +136,7 @@ export const attachCurrentUser = (adminUserRepository: AdminUserRepository) => {
     if (!user) return next(new NotFoundError('User not found'));
 
     try {
-      (req as Request & { userData: IUser }).userData = user;
+      res.locals.user = user;
       next();
     } catch (error) {
       next(error);
