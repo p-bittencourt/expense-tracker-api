@@ -15,7 +15,11 @@ import mongoose from 'mongoose';
 import { ExpenseRepository } from '@/modules/expenses/expense.repository';
 import { ExpenseService } from '@/modules/expenses/expense.service';
 import { ExpenseController } from '@/modules/expenses/expense.controller';
-import { mockAuth, mockCheckUserRole } from '@/middleware/auth.middleware';
+import {
+  mockAttachCurrentUser,
+  mockAuth,
+  mockCheckUserRole,
+} from '@/middleware/auth.middleware';
 import { UserRepository } from '@/modules/users/user.repository';
 import { UserController } from '@/modules/users/user.controller';
 import { UserService } from '@/modules/users/user.service';
@@ -68,7 +72,8 @@ describe('AdminUser Controller', () => {
       userController,
       expenseController,
       () => mockAuth,
-      mockCheckUserRole
+      mockCheckUserRole,
+      mockAttachCurrentUser
     );
     // Mock console.error to suppress error logs during tests
     jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -85,13 +90,13 @@ describe('AdminUser Controller', () => {
     jest.clearAllMocks();
   });
 
-  describe('GET /api/v1/users', () => {
+  describe('GET /api/v1/admin', () => {
     // TODO: refactor get tests to use supertest's .expect()
     it('should retrieve an array of users', async () => {
       mockAdminUserService.getAllUsers = jest.fn().mockResolvedValue([]);
 
       await request(app)
-        .get('/api/v1/users')
+        .get('/api/v1/admin')
         .expect(200)
         .expect((res) => {
           expect(res.body).toBeInstanceOf(Array);
@@ -99,14 +104,14 @@ describe('AdminUser Controller', () => {
     });
   });
 
-  describe('GET /api/v1/users/:id', () => {
+  describe('GET /api/v1/admin/:id', () => {
     it('should return 404 when user is not found', async () => {
       mockAdminUserService.getUserById = jest
         .fn()
         .mockRejectedValue(new NotFoundError('User not found'));
 
       await request(app)
-        .get('/api/v1/users/507f1f77bcf86cd799439011')
+        .get('/api/v1/admin/507f1f77bcf86cd799439011')
         .expect(404)
         .expect((res) => {
           expect(mockAdminUserService.getUserById).toHaveBeenCalled();
@@ -119,7 +124,7 @@ describe('AdminUser Controller', () => {
 
     it('should return 400 for invalid ID format', async () => {
       await request(app)
-        .get('/api/v1/users/invalid-id')
+        .get('/api/v1/admin/invalid-id')
         .expect(400)
         .expect((res) => {
           expect(res.body).toEqual({
@@ -142,7 +147,7 @@ describe('AdminUser Controller', () => {
         .mockResolvedValue(mockUser as IUser);
 
       await request(app)
-        .get('/api/v1/users/507f1f77bcf86cd799439011')
+        .get('/api/v1/admin/507f1f77bcf86cd799439011')
         .expect(200)
         .expect((res) => {
           expect(mockAdminUserService.getUserById).toHaveBeenCalled();
@@ -151,7 +156,7 @@ describe('AdminUser Controller', () => {
     });
   });
 
-  describe('POST /api/v1/users', () => {
+  describe('POST /api/v1/admin', () => {
     const validUser: CreateUserDTO = {
       auth0Id: 'auth0|1234567890',
       username: 'JohnDoe',
@@ -172,7 +177,7 @@ describe('AdminUser Controller', () => {
         .mockResolvedValue(mockUser as IUser);
 
       await request(app)
-        .post('/api/v1/users')
+        .post('/api/v1/admin')
         .send(validUser)
         .expect(201)
         .expect((res) => {
@@ -185,7 +190,7 @@ describe('AdminUser Controller', () => {
 
     it('should return 400 when request body is empty', async () => {
       await request(app)
-        .post('/api/v1/users')
+        .post('/api/v1/admin')
         .send({})
         .expect(400)
         .expect((res) => {
@@ -201,7 +206,7 @@ describe('AdminUser Controller', () => {
       };
 
       await request(app)
-        .post('/api/v1/users')
+        .post('/api/v1/admin')
         .send(incompleteUser)
         .expect(400)
         .expect((res) => {
@@ -211,14 +216,14 @@ describe('AdminUser Controller', () => {
     });
   });
 
-  describe('DELETE /api/users/:id', () => {
+  describe('DELETE /api/admin/:id', () => {
     it('should return 404 NotFoundError if user not found', async () => {
       mockAdminUserService.deleteUser = jest
         .fn()
         .mockRejectedValue(new NotFoundError('User not found'));
 
       await request(app)
-        .delete('/api/v1/users/507f1f77bcf86cd799439011')
+        .delete('/api/v1/admin/507f1f77bcf86cd799439011')
         .expect(404)
         .expect((res) => {
           expect(res.body).toHaveProperty('message');
@@ -237,7 +242,7 @@ describe('AdminUser Controller', () => {
       mockAdminUserService.deleteUser = jest.fn().mockResolvedValue(mockUser);
 
       await request(app)
-        .delete('/api/v1/users/507f1f77bcf86cd799439011')
+        .delete('/api/v1/admin/507f1f77bcf86cd799439011')
         .expect(200)
         .expect((res) => {
           expect(res.body).toHaveProperty('user', mockUser);
@@ -249,7 +254,7 @@ describe('AdminUser Controller', () => {
     });
   });
 
-  describe('PATCH /api/v1/users/:id', () => {
+  describe('PATCH /api/v1/admin/:id', () => {
     it('should successfully update an user', async () => {
       const mockUser: Partial<IUser> = {
         _id: '507f1f77bcf86cd799439011',
@@ -261,7 +266,7 @@ describe('AdminUser Controller', () => {
       mockAdminUserService.updateUser = jest.fn().mockResolvedValue(mockUser);
 
       await request(app)
-        .patch('/api/v1/users/507f1f77bcf86cd799439011')
+        .patch('/api/v1/admin/507f1f77bcf86cd799439011')
         .send({ email: 'janedoe@email.com' })
         .expect(200)
         .expect((res) => {
@@ -276,7 +281,7 @@ describe('AdminUser Controller', () => {
         .mockRejectedValue(new NotFoundError('User not found'));
 
       await request(app)
-        .patch('/api/v1/users/507f1f77bcf86cd799439011')
+        .patch('/api/v1/admin/507f1f77bcf86cd799439011')
         .send({ email: 'test@email.com' })
         .expect((res) => {
           expect(res.body).toHaveProperty('message');
