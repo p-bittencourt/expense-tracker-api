@@ -22,6 +22,7 @@ import { createAdminUserRouter } from './modules/admin/admin.routes';
 export function createApp(
   adminUserController: AdminUserController,
   adminUserService: AdminUserService,
+  userController: UserController,
   expenseController: ExpenseController,
   getAuthMiddleware = () => auth(authConfig),
   getCheckUserRole = () => checkUserRole(adminUserService)
@@ -34,7 +35,7 @@ export function createApp(
   app.use(linkAuth0User(adminUserService));
 
   // Toggle to test authentication properly, when active supplies test-user data to allow postman requests
-  app.use(devAuthBypass);
+  // app.use(devAuthBypass);
 
   // Public routes
   app.get('/', (req, res) => {
@@ -44,6 +45,7 @@ export function createApp(
   app.get('/profile', requiresAuth(), (req, res) => {
     res.send(JSON.stringify(req.oidc.user));
   });
+  app.use('/api/v1/users', requiresAuth(), createUserRouter(userController));
   app.use(
     '/api/v1/admin',
     requiresAuth(),
@@ -61,9 +63,18 @@ export function createApp(
 }
 
 // Dependencies
-const { adminUserController, adminUserService, expenseController } =
-  initializeDependencies();
-const app = createApp(adminUserController, adminUserService, expenseController);
+const {
+  adminUserController,
+  adminUserService,
+  userController,
+  expenseController,
+} = initializeDependencies();
+const app = createApp(
+  adminUserController,
+  adminUserService,
+  userController,
+  expenseController
+);
 
 if (process.env.NODE_ENV !== 'test') {
   connectDB();

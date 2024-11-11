@@ -19,5 +19,10 @@ export function initializeDependencies() {
   const adminUserService = new AdminUserService(adminUserRepository);
   const adminUserController = new AdminUserController(adminUserService);
 
-  return { adminUserController, adminUserService, expenseController };
+  return {
+    adminUserController,
+    adminUserService,
+    userController,
+    expenseController,
+  };
 }

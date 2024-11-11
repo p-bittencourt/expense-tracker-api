@@ -5,78 +5,6 @@ import { UnauthorizedError } from '@/types/errors';
 
 export class UserController implements IUserController {
   constructor(private userService: UserService) {}
-  /*
-  getAllUsers = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const users = await this.userService.getAllUsers();
-      res.json(users);
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  getUserById = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const id: string = req.params.id;
-      const user = await this.userService.getUserById(id);
-      res.json(user);
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  createUser = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const user = await this.userService.createUser(req.body);
-      res.status(201).json(user);
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  deleteUser = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const user = await this.userService.deleteUser(req.params.id);
-      res.status(200).json({
-        user,
-        message: 'User successfully deleted',
-      });
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  editUser = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const user = await this.userService.editUser(req.params.id, req.body);
-      res.status(200).json({
-        user,
-        message: 'User successfully edited',
-      });
-    } catch (error) {
-      next(error);
-    }
-  };
 
   getCurrentUser = async (
     req: Request,
@@ -92,13 +20,11 @@ export class UserController implements IUserController {
       if (!auth0User) {
         return next(new UnauthorizedError('Auth0 user data not available'));
       }
-      const user = await this.userService.findByAuth0Id(auth0User.sub);
-      if (!user) {
-        return next(new UnauthorizedError('User not found'));
-      }
+
+      const user = await this.userService.getCurrentUser(auth0User.sub);
       res.json(user);
     } catch (error) {
       next(error);
     }
-  }; */
+  };
 }
