@@ -11,6 +11,7 @@ import { ExpenseController } from './modules/expenses/expense.controller';
 import { createExpenseRouter } from './modules/expenses/expense.routes';
 import { auth, requiresAuth } from 'express-openid-connect';
 import {
+  attachCurrentUser,
   checkUserRole,
   devAuthBypass,
   linkAuth0User,
@@ -18,14 +19,17 @@ import {
 import { AdminUserController } from './modules/admin/admin.controller';
 import { AdminUserService } from './modules/admin/admin.service';
 import { createAdminUserRouter } from './modules/admin/admin.routes';
+import { AdminUserRepository } from './modules/admin/admin.repository';
 
 export function createApp(
+  adminUserRepository: AdminUserRepository,
   adminUserController: AdminUserController,
   adminUserService: AdminUserService,
   userController: UserController,
   expenseController: ExpenseController,
   getAuthMiddleware = () => auth(authConfig),
-  getCheckUserRole = () => checkUserRole(adminUserService)
+  getCheckUserRole = () => checkUserRole(adminUserService),
+  getAttachCurrentUser = () => attachCurrentUser(adminUserRepository)
 ) {
   const app = express();
   // Middleware
@@ -33,6 +37,7 @@ export function createApp(
   app.use(express.json());
   app.use(morgan('dev'));
   app.use(linkAuth0User(adminUserService));
+  app.use(getAttachCurrentUser());
 
   // Toggle to test authentication properly, when active supplies test-user data to allow postman requests
   // app.use(devAuthBypass);
@@ -45,7 +50,12 @@ export function createApp(
   app.get('/profile', requiresAuth(), (req, res) => {
     res.send(JSON.stringify(req.oidc.user));
   });
-  app.use('/api/v1/users', requiresAuth(), createUserRouter(userController));
+  app.use(
+    '/home',
+    requiresAuth(),
+    getAttachCurrentUser(),
+    createUserRouter(userController)
+  );
   app.use(
     '/api/v1/admin',
     requiresAuth(),
@@ -64,12 +74,14 @@ export function createApp(
 
 // Dependencies
 const {
+  adminUserRepository,
   adminUserController,
   adminUserService,
   userController,
   expenseController,
 } = initializeDependencies();
 const app = createApp(
+  adminUserRepository,
   adminUserController,
   adminUserService,
   userController,

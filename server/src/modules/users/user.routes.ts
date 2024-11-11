@@ -11,9 +11,9 @@ import { CreateUserDTO, UpdateUserDTO } from './user.dto';
 export const createUserRouter = (userController: UserController) => {
   const router = Router();
 
-  router.get('/me', userController.getCurrentUser);
-  /*
+  router.get('/', userController.home);
 
+  /*
   router.get('/', userController.getAllUsers);
   router.get('/:id', validateObjectId, userController.getUserById);
   router.post(
@@ -31,7 +31,7 @@ export const createUserRouter = (userController: UserController) => {
     validateDTO(UpdateUserDTO),
     userController.editUser
   );
-
   */
+
   return router;
 };

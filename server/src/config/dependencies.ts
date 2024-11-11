@@ -20,6 +20,7 @@ export function initializeDependencies() {
   const adminUserController = new AdminUserController(adminUserService);
 
   return {
+    adminUserRepository,
     adminUserController,
     adminUserService,
     userController,

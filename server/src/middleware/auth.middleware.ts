@@ -4,9 +4,14 @@ import {
   UpdateUserDTO,
   UserResponseDTO,
 } from '@/modules/users/user.dto';
-import { UnauthorizedError, ValidationError } from '@/types/errors';
-import { Roles } from '@/modules/users/user.model';
+import {
+  NotFoundError,
+  UnauthorizedError,
+  ValidationError,
+} from '@/types/errors';
+import { IUser, Roles } from '@/modules/users/user.model';
 import { AdminUserService } from '@/modules/admin/admin.service';
+import { AdminUserRepository } from '@/modules/admin/admin.repository';
 
 export const linkAuth0User = (adminUserService: AdminUserService) => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -115,5 +120,26 @@ export const checkUserRole = (adminUserService: AdminUserService) => {
 export const mockCheckUserRole = () => {
   return async (req: Request, res: Response, next: NextFunction) => {
     next();
+  };
+};
+
+export const attachCurrentUser = (adminUserRepository: AdminUserRepository) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.oidc.isAuthenticated())
+      return next(new UnauthorizedError('User not authenticated'));
+
+    const auth0User = req.oidc.user;
+    if (!auth0User)
+      return next(new UnauthorizedError('Auth0 user data unavailable'));
+
+    const user = await adminUserRepository.findOne({ auth0Id: auth0User.sub });
+    if (!user) return next(new NotFoundError('User not found'));
+
+    try {
+      (req as Request & { userData: IUser }).userData = user;
+      next();
+    } catch (error) {
+      next(error);
+    }
   };
 };
