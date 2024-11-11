@@ -6,7 +6,6 @@ import { initializeDependencies } from './config/dependencies';
 import { errorHandler } from './middleware/error.middleware';
 import { createUserRouter } from './modules/users/user.routes';
 import { UserController } from './modules/users/user.controller';
-import { UserService } from './modules/users/user.service';
 import { ExpenseController } from './modules/expenses/expense.controller';
 import { createExpenseRouter } from './modules/expenses/expense.routes';
 import { auth, requiresAuth } from 'express-openid-connect';
@@ -37,10 +36,9 @@ export function createApp(
   app.use(express.json());
   app.use(morgan('dev'));
   app.use(linkAuth0User(adminUserService));
-  app.use(getAttachCurrentUser());
-
   // Toggle to test authentication properly, when active supplies test-user data to allow postman requests
-  // app.use(devAuthBypass);
+  app.use(devAuthBypass);
+  app.use(getAttachCurrentUser());
 
   // Public routes
   app.get('/', (req, res) => {
@@ -65,6 +63,7 @@ export function createApp(
   app.use(
     '/api/v1/expenses',
     requiresAuth(),
+    getAttachCurrentUser(),
     createExpenseRouter(expenseController)
   );
   // Error Handler

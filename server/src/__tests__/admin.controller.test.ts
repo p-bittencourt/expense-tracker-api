@@ -17,26 +17,35 @@ import { ExpenseService } from '@/modules/expenses/expense.service';
 import { ExpenseController } from '@/modules/expenses/expense.controller';
 import { mockAuth, mockCheckUserRole } from '@/middleware/auth.middleware';
 import { UserRepository } from '@/modules/users/user.repository';
+import { UserController } from '@/modules/users/user.controller';
+import { UserService } from '@/modules/users/user.service';
 
 // Mock the UserRepository and UserService
 jest.mock('@/modules/admin/admin.repository');
 jest.mock('@/modules/admin/admin.service');
+jest.mock('@/modules/users/user.repository');
+jest.mock('@/modules/users/user.service');
 jest.mock('@/modules/expenses/expense.repository');
 jest.mock('@/modules/expenses/expense.service');
 
 describe('AdminUser Controller', () => {
   let app: Express;
   let mockUserRepository: jest.Mocked<UserRepository>;
+  let mockUserService: jest.Mocked<UserService>;
   let mockAdminUserRepository: jest.Mocked<AdminUserRepository>;
   let mockAdminUserService: jest.Mocked<AdminUserService>;
   let mockExpenseRepository: jest.Mocked<ExpenseRepository>;
   let mockExpenseService: jest.Mocked<ExpenseService>;
   let adminUserController: AdminUserController;
+  let userController: UserController;
   let expenseController: ExpenseController;
 
   beforeAll(() => {
     // Create our mock instances
     mockUserRepository = new UserRepository() as jest.Mocked<UserRepository>;
+    mockUserService = new UserService(
+      mockUserRepository
+    ) as jest.Mocked<UserService>;
     mockAdminUserRepository =
       new AdminUserRepository() as jest.Mocked<AdminUserRepository>;
     mockAdminUserService = new AdminUserService(
@@ -49,11 +58,14 @@ describe('AdminUser Controller', () => {
       mockUserRepository
     ) as jest.Mocked<ExpenseService>;
     adminUserController = new AdminUserController(mockAdminUserService);
+    userController = new UserController(mockUserService);
     expenseController = new ExpenseController(mockExpenseService);
     // Create the app with our mocked controllers
     app = createApp(
+      mockAdminUserRepository,
       adminUserController,
       mockAdminUserService,
+      userController,
       expenseController,
       () => mockAuth,
       mockCheckUserRole

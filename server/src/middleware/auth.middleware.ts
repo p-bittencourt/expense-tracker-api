@@ -71,6 +71,7 @@ export function devAuthBypass(req: Request, res: Response, next: NextFunction) {
     process.env.NODE_ENV === 'development' ||
     process.env.NODE_ENV === 'test'
   ) {
+    console.log('in devAuthBypass');
     req.oidc = {
       isAuthenticated: () => true,
       user: {
@@ -104,7 +105,6 @@ export const mockAuth = (req: Request, res: Response, next: NextFunction) => {
 
 export const checkUserRole = (adminUserService: AdminUserService) => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    console.log('in check user role');
     const auth0User = req.oidc.user;
     if (!auth0User)
       return next(new UnauthorizedError('Auth0 user data not available'));
@@ -141,5 +141,11 @@ export const attachCurrentUser = (adminUserRepository: AdminUserRepository) => {
     } catch (error) {
       next(error);
     }
+  };
+};
+
+export const mockAttachCurrentUser = () => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    res.locals.user = {};
   };
 };

@@ -19,9 +19,6 @@ export class ExpenseService implements IExpenseService {
       expenseData,
       userId
     );
-
-    await this.userRepository.addExpenseToUser(userId, expense.id.toString());
-
     return expense;
   }
 }
