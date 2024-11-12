@@ -5,11 +5,21 @@ import {
   attachCurrentUser,
   checkUserRole,
   devAuthBypass,
+  mockAttachCurrentUser,
+  mockAuth,
+  mockCheckUserRole,
 } from '@/middleware/auth.middleware';
 
 export const createMiddleware = (deps: AppDependencies) => ({
-  auth: () => auth(authConfig),
-  checkUserRole: () => checkUserRole(deps.services.adminUser),
-  attachCurrentUser: () => attachCurrentUser(deps.repositories.adminUser),
+  auth:
+    process.env.NODE_ENV === 'test' ? () => mockAuth : () => auth(authConfig),
+  checkUserRole:
+    process.env.NODE_ENV === 'test'
+      ? mockCheckUserRole
+      : () => checkUserRole(deps.services.adminUser),
+  attachCurrentUser:
+    process.env.NODE_ENV === 'test'
+      ? mockAttachCurrentUser
+      : () => attachCurrentUser(deps.repositories.adminUser),
   // devAuthBypass: process.env.NODE_ENV === 'development' ? devAuthBypass : undefined,
 });

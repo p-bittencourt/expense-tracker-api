@@ -10,7 +10,7 @@ import {
   UserResponseDTO,
 } from '@/modules/users/user.dto';
 import { NotFoundError } from '@/types/errors';
-import type { Express } from 'express';
+import type { Application, Express } from 'express';
 import mongoose from 'mongoose';
 import { ExpenseRepository } from '@/modules/expenses/expense.repository';
 import { ExpenseService } from '@/modules/expenses/expense.service';
@@ -23,6 +23,7 @@ import {
 import { UserRepository } from '@/modules/users/user.repository';
 import { UserController } from '@/modules/users/user.controller';
 import { UserService } from '@/modules/users/user.service';
+import { AppDependencies } from '@/types/app.dependencies';
 
 // Mock the UserRepository and UserService
 jest.mock('@/modules/admin/admin.repository');
@@ -33,7 +34,7 @@ jest.mock('@/modules/expenses/expense.repository');
 jest.mock('@/modules/expenses/expense.service');
 
 describe('AdminUser Controller', () => {
-  let app: Express;
+  let app: Application;
   let mockUserRepository: jest.Mocked<UserRepository>;
   let mockUserService: jest.Mocked<UserService>;
   let mockAdminUserRepository: jest.Mocked<AdminUserRepository>;
@@ -44,7 +45,7 @@ describe('AdminUser Controller', () => {
   let userController: UserController;
   let expenseController: ExpenseController;
 
-  beforeAll(() => {
+  function initializeTestDependencies(): AppDependencies {
     // Create our mock instances
     mockUserRepository = new UserRepository() as jest.Mocked<UserRepository>;
     mockUserService = new UserService(
@@ -64,17 +65,32 @@ describe('AdminUser Controller', () => {
     adminUserController = new AdminUserController(mockAdminUserService);
     userController = new UserController(mockUserService);
     expenseController = new ExpenseController(mockExpenseService);
+
+    return {
+      repositories: {
+        adminUser: mockAdminUserRepository,
+      },
+      services: {
+        adminUser: mockAdminUserService,
+      },
+      controllers: {
+        adminUser: adminUserController,
+        user: userController,
+        expense: expenseController,
+      },
+    };
+  }
+
+  beforeAll(() => {
     // Create the app with our mocked controllers
-    app = createApp(
-      mockAdminUserRepository,
-      adminUserController,
-      mockAdminUserService,
-      userController,
-      expenseController,
-      () => mockAuth,
-      mockCheckUserRole,
-      mockAttachCurrentUser
-    );
+    const testDependencies = initializeTestDependencies();
+    // testDependencies.middleware = {
+    //   auth: () => mockAuth,
+    //   checkUserRole: mockCheckUserRole,
+    //   attachCurrentUser: mockAttachCurrentUser,
+    // };
+
+    app = createApp(testDependencies);
     // Mock console.error to suppress error logs during tests
     jest.spyOn(console, 'error').mockImplementation(() => {});
   });

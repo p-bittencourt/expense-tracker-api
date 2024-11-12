@@ -8,18 +8,18 @@ import { createRoutes } from './config/routes.config';
 
 export function createApp(dependencies: AppDependencies): Application {
   const app = express();
-  const middleware = createMiddleware(dependencies);
+  const appMiddleware = createMiddleware(dependencies);
 
   // Global middleware
   app.use(express.json());
   app.use(morgan('dev'));
-  app.use(middleware.auth());
+  app.use(appMiddleware.auth());
   app.use(linkAuth0User(dependencies.services.adminUser));
 
   app.use(devAuthBypass); // toggle to activate or disactivate
 
   // Apply routes
-  createRoutes(app, dependencies, middleware);
+  createRoutes(app, dependencies, appMiddleware);
 
   app.use(errorHandler);
 
