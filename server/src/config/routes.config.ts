@@ -38,17 +38,17 @@ export const createRoutes = (
     {
       path: '/api/v1/admin',
       router: createAdminUserRouter(deps.controllers.adminUser),
-      middleware: [middleware.checkUserRole],
+      middleware: [middleware.checkUserRole()],
     },
     {
       path: '/api/v1/expenses',
       router: createExpenseRouter(deps.controllers.expense),
-      middlewares: [middleware.attachCurrentUser()],
+      middleware: [middleware.attachCurrentUser()],
     },
   ];
 
-  authRoutes.forEach(({ path, router, handler, middlewares = [] }) => {
-    const routeMiddleware = [requiresAuth(), ...middlewares];
+  authRoutes.forEach(({ path, router, handler, middleware = [] }) => {
+    const routeMiddleware = [requiresAuth(), ...middleware];
     if (router) {
       app.use(path, ...routeMiddleware, router);
     } else if (handler) {
