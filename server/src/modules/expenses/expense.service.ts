@@ -48,9 +48,8 @@ export class ExpenseService implements IExpenseService {
   async deleteExpense(
     user: IUser,
     expenseId: string
-  ): Promise<ExpenseResponseDTO | null> {
+  ): Promise<ExpenseResponseDTO> {
     const expense = await this.expenseRepository.deleteExpense(expenseId);
-    if (!expense) return null;
     const updatedUser = await this.userRepository.removeExpenseFromUser(
       user,
       expenseId

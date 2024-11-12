@@ -25,20 +25,19 @@ export class ExpenseRepository implements IExpenseRepository {
       if (!expense) throw new NotFoundError('Expense not found');
       return expense;
     } catch (error) {
-      if (error instanceof NotFoundError) throw error; // Re-throw NotFoundError
+      if (error instanceof NotFoundError) throw error;
       handleDatabaseError(error, 'getExpenseById');
     }
   }
 
-  async deleteExpense(id: string): Promise<IExpense | undefined> {
+  async deleteExpense(id: string): Promise<IExpense> {
     try {
       const expense = await Expense.findByIdAndDelete(id);
       if (!expense) throw new NotFoundError('Expense not found');
       return expense;
     } catch (error) {
-      if (!(error instanceof NotFoundError)) {
-        handleDatabaseError(error, 'getExpenseById');
-      }
+      if (error instanceof NotFoundError) throw error;
+      handleDatabaseError(error, 'getExpenseById');
     }
   }
 
