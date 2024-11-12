@@ -1,12 +1,6 @@
 import { AppDependencies } from '@/types/app.dependencies';
 import { createMiddleware } from './middleware.config';
-import {
-  Application,
-  Request,
-  RequestHandler,
-  Response,
-  Router,
-} from 'express';
+import { Application, Request, Response } from 'express';
 import { createUserRouter } from '@/modules/users/user.routes';
 import { createAdminUserRouter } from '@/modules/admin/admin.routes';
 import { createExpenseRouter } from '@/modules/expenses/expense.routes';

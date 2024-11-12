@@ -18,11 +18,6 @@ const app = createApp({
     adminUser: dependencies.adminUserService,
   },
 
-  // Override middleware for testing
-  //middleware: process.env.NODE_ENV === 'test' ? {
-  //  attachCurrentUser: () => attachTestUser(dependencies.adminUserRepository)
-  //} : undefined,
-
   // Activate for manual testing
   // middleware: {
   //   attachCurrentUser: () => attachTestUser(dependencies.adminUserRepository),
