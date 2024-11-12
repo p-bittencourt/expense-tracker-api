@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Application } from 'express';
 import morgan from 'morgan';
 import connectDB, { updateUserSchema } from './config/database';
 import { authConfig } from './config/auth0';
@@ -20,8 +20,31 @@ import { AdminUserController } from './modules/admin/admin.controller';
 import { AdminUserService } from './modules/admin/admin.service';
 import { createAdminUserRouter } from './modules/admin/admin.routes';
 import { AdminUserRepository } from './modules/admin/admin.repository';
+import { AppDependencies } from './types/app.dependencies';
+import { createMiddleware } from './config/middleware.config';
+import { createRoutes } from './config/routes.config';
 
-export function createApp(
+export function createApp(dependencies: AppDependencies): Application {
+  const app = express();
+  const middleware = createMiddleware(dependencies);
+
+  // Global middleware
+  app.use(express.json());
+  app.use(morgan('dev'));
+  app.use(middleware.auth());
+  app.use(linkAuth0User(dependencies.services.adminUser));
+
+  // app.use(devAuthBypass); // toggle to activate or disactivate
+
+  // Apply routes
+  createRoutes(app, dependencies, middleware);
+
+  app.use(errorHandler);
+
+  return app;
+}
+
+/* export function createApp(
   adminUserRepository: AdminUserRepository,
   adminUserController: AdminUserController,
   adminUserService: AdminUserService,
@@ -96,4 +119,4 @@ if (process.env.NODE_ENV !== 'test') {
   connectDB();
 }
 
-export default app;
+export default app; */

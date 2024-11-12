@@ -110,8 +110,8 @@ export const checkUserRole = (adminUserService: AdminUserService) => {
       return next(new UnauthorizedError('Auth0 user data not available'));
     */
 
+    console.log('checking user role');
     const user = res.locals.user;
-    console.log(user);
     if (!user || user.role !== 'ADMIN')
       return next(new UnauthorizedError('Admin only'));
 
@@ -127,6 +127,8 @@ export const mockCheckUserRole = () => {
 
 export const attachCurrentUser = (adminUserRepository: AdminUserRepository) => {
   return async (req: Request, res: Response, next: NextFunction) => {
+    console.log('attaching user...');
+
     if (!req.oidc.isAuthenticated())
       return next(new UnauthorizedError('User not authenticated'));
 
@@ -148,11 +150,12 @@ export const attachCurrentUser = (adminUserRepository: AdminUserRepository) => {
 
 export const attachTestUser = (adminUserRepository: AdminUserRepository) => {
   return async (req: Request, res: Response, next: NextFunction) => {
+    console.log('attaching test user');
     const testUserAuth0Id = 'auth0|67324324b3734a0a45c520c6';
     const user = await adminUserRepository.findOne({
       auth0Id: testUserAuth0Id,
     });
-
+    console.log(user);
     try {
       res.locals.user = user;
       next();
