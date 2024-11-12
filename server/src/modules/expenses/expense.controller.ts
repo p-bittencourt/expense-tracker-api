@@ -7,6 +7,8 @@ import { IUser } from '../users/user.model';
 export class ExpenseController implements IExpenseController {
   constructor(private expenseService: ExpenseService) {}
 
+  // TODO: implement find expense by type
+
   sayHi = async (
     req: Request,
     res: Response,
