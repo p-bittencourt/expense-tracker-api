@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongoose';
 import { ExpenseType } from '../expense-type.enum';
 import { CreateExpenseDTO, UpdateExpenseDTO } from '../expense.dto';
 import { IExpense } from '../expense.model';
@@ -5,8 +6,8 @@ import { IExpense } from '../expense.model';
 export interface IExpenseRepository {
   // CRUD operations
   createExpense(
-    expenseData: CreateExpenseDTO,
-    userId: string
+    userId: ObjectId,
+    expenseData: CreateExpenseDTO
   ): Promise<IExpense>;
   getExpenseById(id: string): Promise<IExpense>;
   deleteExpense(id: string): Promise<IExpense>;

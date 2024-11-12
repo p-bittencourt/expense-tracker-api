@@ -38,6 +38,7 @@ export function createApp(
   app.use(morgan('dev'));
   app.use(linkAuth0User(adminUserService));
   // Toggle to test authentication properly, when active supplies test-user data to allow postman requests
+  // devAuthBypass must come before attachCurrentUser to work properly.
   app.use(devAuthBypass);
   app.use(getAttachCurrentUser());
 
@@ -51,13 +52,13 @@ export function createApp(
   });
   app.use(
     '/home',
-    // requiresAuth(), // comment out for testing
+    requiresAuth(),
     getAttachCurrentUser(),
     createUserRouter(userController)
   );
   app.use(
     '/api/v1/admin',
-    // requiresAuth(), // comment out for testing
+    requiresAuth(),
     getCheckUserRole(),
     createAdminUserRouter(adminUserController)
   );

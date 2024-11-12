@@ -3,11 +3,12 @@ import { CreateExpenseDTO, UpdateExpenseDTO } from './expense.dto';
 import Expense, { IExpense } from './expense.model';
 import { ExpenseType } from './expense-type.enum';
 import { handleDatabaseError } from '@/util/handle-database-error';
+import { ObjectId } from 'mongoose';
 
 export class ExpenseRepository implements IExpenseRepository {
   async createExpense(
-    expenseData: CreateExpenseDTO,
-    userId: string
+    userId: ObjectId,
+    expenseData: CreateExpenseDTO
   ): Promise<IExpense> {
     try {
       const expense = await Expense.create({ userId, ...expenseData });

@@ -1,9 +1,10 @@
-import { CreateExpenseDTO } from '../expense.dto';
+import { ObjectId } from 'mongoose';
+import { CreateExpenseDTO, ExpenseResponseDTO } from '../expense.dto';
 import { IExpense } from '../expense.model';
 
 export interface IExpenseService {
   createExpense(
-    expenseData: CreateExpenseDTO,
-    userId: string
-  ): Promise<IExpense>;
+    userId: ObjectId,
+    expenseData: CreateExpenseDTO
+  ): Promise<ExpenseResponseDTO | null>;
 }
