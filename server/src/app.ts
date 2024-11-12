@@ -1,6 +1,6 @@
 import express from 'express';
 import morgan from 'morgan';
-import connectDB from './config/database';
+import connectDB, { updateUserSchema } from './config/database';
 import { authConfig } from './config/auth0';
 import { initializeDependencies } from './config/dependencies';
 import { errorHandler } from './middleware/error.middleware';

@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { UserService } from './user.service';
 import { IUserController } from './interfaces/IUserController';
 import { UnauthorizedError } from '@/types/errors';
+import { IUser } from './user.model';
 
 export class UserController implements IUserController {
   constructor(private userService: UserService) {}
@@ -15,6 +16,26 @@ export class UserController implements IUserController {
       const user = res.locals.user;
       if (user) {
         res.json(user);
+        return;
+      }
+      res.json({
+        message: 'No user data available',
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getUserExpenses = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const user: IUser = res.locals.user;
+      if (user) {
+        const expenses = await this.userService.getUserExpenses(user);
+        res.json(expenses);
         return;
       }
       res.json({

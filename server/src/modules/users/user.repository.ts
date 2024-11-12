@@ -22,4 +22,13 @@ export class UserRepository implements IUserRepository {
       handleDatabaseError(error, 'addExpenseToUser');
     }
   }
+
+  async getUserExpenses(user: IUser): Promise<Omit<IUser, never>> {
+    try {
+      const populatedUser = await user.populate('expenses');
+      return populatedUser;
+    } catch (error) {
+      handleDatabaseError(error, 'getUserExpenses');
+    }
+  }
 }

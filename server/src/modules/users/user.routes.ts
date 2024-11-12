@@ -12,6 +12,7 @@ export const createUserRouter = (userController: UserController) => {
   const router = Router();
 
   router.get('/', userController.home);
+  router.get('/expenses', userController.getUserExpenses);
 
   /*
   router.get('/', userController.getAllUsers);

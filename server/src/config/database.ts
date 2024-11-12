@@ -17,4 +17,12 @@ const connectDB = async () => {
   }
 };
 
+export async function updateUserSchema() {
+  const db = mongoose.connection;
+  await db.collection('users').updateMany(
+    { expenses: { $type: 'array' } }, // ensure it’s an array of ObjectIds
+    { $set: { 'expenses.$[].ref': 'Expense' } }
+  );
+}
+
 export default connectDB;

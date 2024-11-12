@@ -3,7 +3,7 @@ import { ExpenseType } from './expense-type.enum';
 
 const ExpenseSchema: Schema = new Schema(
   {
-    userId: { type: Schema.Types.ObjectId, ref: 'Users' },
+    userId: { type: Schema.Types.ObjectId, ref: 'User' },
     title: { type: String, required: true },
     cost: { type: Number, required: true },
     type: {
