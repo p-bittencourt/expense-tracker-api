@@ -33,14 +33,14 @@ export class UserController implements IUserController {
   ): Promise<void> => {
     try {
       const user: IUser = res.locals.user;
-      if (user) {
-        const expenses = await this.userService.getUserExpenses(user);
-        res.json(expenses);
+      if (!user) {
+        res.json({
+          message: 'No user data available',
+        });
         return;
       }
-      res.json({
-        message: 'No user data available',
-      });
+      const expenses = await this.userService.getUserExpenses(user);
+      res.json(expenses);
     } catch (error) {
       next(error);
     }
