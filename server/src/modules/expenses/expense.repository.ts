@@ -4,6 +4,7 @@ import Expense, { IExpense } from './expense.model';
 import { ExpenseType } from './expense-type.enum';
 import { handleDatabaseError } from '@/util/handle-database-error';
 import { ObjectId } from 'mongoose';
+import { NotFoundError } from '@/types/errors';
 
 export class ExpenseRepository implements IExpenseRepository {
   async createExpense(
@@ -18,9 +19,18 @@ export class ExpenseRepository implements IExpenseRepository {
     }
   }
 
-  getExpenseById(id: string): Promise<IExpense> {
-    throw new Error('Method not implemented.');
+  async getExpenseById(id: string): Promise<IExpense | undefined> {
+    try {
+      const expense = await Expense.findById(id);
+      if (!expense) throw new NotFoundError('Expense not found');
+      return expense;
+    } catch (error) {
+      if (!(error instanceof NotFoundError)) {
+        handleDatabaseError(error, 'getExpenseById');
+      }
+    }
   }
+
   deleteExpense(id: string): Promise<IExpense> {
     throw new Error('Method not implemented.');
   }

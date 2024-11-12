@@ -12,11 +12,12 @@ export const createExpenseRouter = (expenseController: ExpenseController) => {
 
   router.get('/', expenseController.sayHi);
   router.post(
-    '/:userId',
+    '/',
     validateContentType,
     validateDTO(CreateExpenseDTO),
     expenseController.createExpense
   );
+  router.get('/:id', validateObjectId, expenseController.getExpenseById);
 
   return router;
 };

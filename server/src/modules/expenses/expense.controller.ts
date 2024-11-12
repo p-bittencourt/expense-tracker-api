@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ExpenseService } from './expense.service';
 import { IExpenseController } from './interfaces/IExpenseController';
-import { NotFoundError } from '@/types/errors';
+import { NotFoundError, ValidationError } from '@/types/errors';
 
 export class ExpenseController implements IExpenseController {
   constructor(private expenseService: ExpenseService) {}
@@ -26,6 +26,20 @@ export class ExpenseController implements IExpenseController {
       }
       const expense = await this.expenseService.createExpense(userId, req.body);
       res.status(201).send(expense);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getExpenseById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const expenseId = req.params.id;
+      const expense = await this.expenseService.getExpenseById(expenseId);
+      res.status(200).send(expense);
     } catch (error) {
       next(error);
     }

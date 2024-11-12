@@ -23,8 +23,12 @@ export class ExpenseService implements IExpenseService {
       userId,
       expense.id
     );
-    console.log(updatedUser);
-    console.log(expense);
+    return new ExpenseResponseDTO(expense);
+  }
+
+  async getExpenseById(id: string): Promise<ExpenseResponseDTO | null> {
+    const expense = await this.expenseRepository.getExpenseById(id);
+    if (!expense) return null;
     return new ExpenseResponseDTO(expense);
   }
 }
