@@ -11,7 +11,10 @@ export interface IExpenseRepository {
   ): Promise<IExpense>;
   getExpenseById(id: string): Promise<IExpense | undefined>;
   deleteExpense(id: string): Promise<IExpense>;
-  updateExpense(id: string, expenseData: UpdateExpenseDTO): Promise<IExpense>;
+  updateExpense(
+    id: string,
+    expenseData: UpdateExpenseDTO
+  ): Promise<IExpense | undefined>;
 
   // User-specific queries
   getExpenseByUserId(userId: string): Promise<IExpense[]>;

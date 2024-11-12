@@ -34,9 +34,25 @@ export class ExpenseRepository implements IExpenseRepository {
   deleteExpense(id: string): Promise<IExpense> {
     throw new Error('Method not implemented.');
   }
-  updateExpense(id: string, expenseData: UpdateExpenseDTO): Promise<IExpense> {
-    throw new Error('Method not implemented.');
+
+  async updateExpense(
+    id: string,
+    expenseData: UpdateExpenseDTO
+  ): Promise<IExpense | undefined> {
+    try {
+      const updatedExpense = await Expense.findByIdAndUpdate(id, expenseData, {
+        new: true,
+      });
+      if (!updatedExpense)
+        throw new NotFoundError(`Expense with ID ${id} not found`);
+      return updatedExpense;
+    } catch (error) {
+      if (!(error instanceof NotFoundError)) {
+        handleDatabaseError(error, 'getExpenseById');
+      }
+    }
   }
+
   getExpenseByUserId(userId: string): Promise<IExpense[]> {
     throw new Error('Method not implemented.');
   }

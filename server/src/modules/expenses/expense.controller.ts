@@ -44,4 +44,25 @@ export class ExpenseController implements IExpenseController {
       next(error);
     }
   };
+
+  updateExpense = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const expenseId = req.params.id;
+      const expenseData = req.body;
+      const updatedExpense = await this.expenseService.updateExpense(
+        expenseId,
+        expenseData
+      );
+      if (!updatedExpense) {
+        return next(new NotFoundError('User not found'));
+      }
+      res.status(200).send(updatedExpense);
+    } catch (error) {
+      next(error);
+    }
+  };
 }

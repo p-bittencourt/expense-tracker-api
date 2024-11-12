@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { ExpenseController } from './expense.controller';
-import { CreateExpenseDTO } from './expense.dto';
+import { CreateExpenseDTO, UpdateExpenseDTO } from './expense.dto';
 import {
   validateContentType,
   validateDTO,
@@ -18,6 +18,12 @@ export const createExpenseRouter = (expenseController: ExpenseController) => {
     expenseController.createExpense
   );
   router.get('/:id', validateObjectId, expenseController.getExpenseById);
+  router.patch(
+    '/:id',
+    validateObjectId,
+    validateDTO(UpdateExpenseDTO),
+    expenseController.updateExpense
+  );
 
   return router;
 };

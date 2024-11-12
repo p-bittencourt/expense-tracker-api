@@ -1,6 +1,10 @@
 import { ObjectId } from 'mongoose';
 import { UserRepository } from '../users/user.repository';
-import { CreateExpenseDTO, ExpenseResponseDTO } from './expense.dto';
+import {
+  CreateExpenseDTO,
+  ExpenseResponseDTO,
+  UpdateExpenseDTO,
+} from './expense.dto';
 import { IExpense } from './expense.model';
 import { ExpenseRepository } from './expense.repository';
 import { IExpenseService } from './interfaces/IExpenseService';
@@ -28,6 +32,15 @@ export class ExpenseService implements IExpenseService {
 
   async getExpenseById(id: string): Promise<ExpenseResponseDTO | null> {
     const expense = await this.expenseRepository.getExpenseById(id);
+    if (!expense) return null;
+    return new ExpenseResponseDTO(expense);
+  }
+
+  async updateExpense(
+    id: string,
+    expenseData: UpdateExpenseDTO
+  ): Promise<ExpenseResponseDTO | null> {
+    const expense = await this.expenseRepository.updateExpense(id, expenseData);
     if (!expense) return null;
     return new ExpenseResponseDTO(expense);
   }
