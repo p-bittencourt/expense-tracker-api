@@ -15,18 +15,17 @@ export class ExpenseController implements IExpenseController {
     res.status(201).send({ message: 'hi' });
   };
 
-  // TODO: refactor to send user object directly, rather than id for querying
   createExpense = async (
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> => {
     try {
-      const userId = res.locals.user._id;
-      if (!userId) {
-        return next(new NotFoundError('User not found'));
+      const user: IUser = res.locals.user;
+      if (!user) {
+        throw new NotFoundError('User not found');
       }
-      const expense = await this.expenseService.createExpense(userId, req.body);
+      const expense = await this.expenseService.createExpense(user, req.body);
       res.status(201).send(expense);
     } catch (error) {
       next(error);

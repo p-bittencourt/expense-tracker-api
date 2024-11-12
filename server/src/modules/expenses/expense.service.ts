@@ -17,15 +17,16 @@ export class ExpenseService implements IExpenseService {
   ) {}
 
   async createExpense(
-    userId: ObjectId,
+    user: IUser,
     expenseData: CreateExpenseDTO
   ): Promise<ExpenseResponseDTO | null> {
+    const userId = user._id as unknown as ObjectId;
     const expense = await this.expenseRepository.createExpense(
       userId,
       expenseData
     );
     const updatedUser = await this.userRepository.addExpenseToUser(
-      userId,
+      user,
       expense.id
     );
     return new ExpenseResponseDTO(expense);

@@ -5,18 +5,12 @@ import { NotFoundError } from '@/types/errors';
 import { handleDatabaseError } from '@/util/handle-database-error';
 
 export class UserRepository implements IUserRepository {
-  async addExpenseToUser(
-    userId: ObjectId,
-    expenseId: ObjectId
-  ): Promise<IUser> {
+  async addExpenseToUser(user: IUser, expenseId: ObjectId): Promise<IUser> {
     try {
-      const user = await User.findByIdAndUpdate(
-        userId,
-        { $push: { expenses: expenseId } },
-        { new: true }
-      );
-      if (!user) throw new NotFoundError('User not found');
-      return user;
+      user.expenses.push(expenseId);
+      const updatedUser = await user.save();
+      if (!updatedUser) throw new NotFoundError('User not found');
+      return updatedUser;
     } catch (error) {
       handleDatabaseError(error, 'addExpenseToUser');
     }
