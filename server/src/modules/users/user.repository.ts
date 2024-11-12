@@ -5,7 +5,6 @@ import { NotFoundError } from '@/types/errors';
 import { handleDatabaseError } from '@/util/handle-database-error';
 
 export class UserRepository implements IUserRepository {
-  // TODO: this needs much testing after fixing relation mongodb user / auth user
   async addExpenseToUser(
     userId: ObjectId,
     expenseId: ObjectId
@@ -20,6 +19,19 @@ export class UserRepository implements IUserRepository {
       return user;
     } catch (error) {
       handleDatabaseError(error, 'addExpenseToUser');
+    }
+  }
+
+  async removeExpenseFromUser(user: IUser, expenseId: string): Promise<IUser> {
+    try {
+      user.expenses = user.expenses.filter(
+        (expense) => expense.toString() !== expenseId
+      );
+      const updatedUser = await user.save();
+      console.log(updatedUser);
+      return updatedUser;
+    } catch (error) {
+      handleDatabaseError(error, 'removeExpenseFromUser');
     }
   }
 

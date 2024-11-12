@@ -10,7 +10,7 @@ export interface IExpenseRepository {
     expenseData: CreateExpenseDTO
   ): Promise<IExpense>;
   getExpenseById(id: string): Promise<IExpense | undefined>;
-  deleteExpense(id: string): Promise<IExpense>;
+  deleteExpense(id: string): Promise<IExpense | undefined>;
   updateExpense(
     id: string,
     expenseData: UpdateExpenseDTO

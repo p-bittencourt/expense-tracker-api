@@ -31,8 +31,16 @@ export class ExpenseRepository implements IExpenseRepository {
     }
   }
 
-  deleteExpense(id: string): Promise<IExpense> {
-    throw new Error('Method not implemented.');
+  async deleteExpense(id: string): Promise<IExpense | undefined> {
+    try {
+      const expense = await Expense.findByIdAndDelete(id);
+      if (!expense) throw new NotFoundError('Expense not found');
+      return expense;
+    } catch (error) {
+      if (!(error instanceof NotFoundError)) {
+        handleDatabaseError(error, 'getExpenseById');
+      }
+    }
   }
 
   async updateExpense(
@@ -56,6 +64,7 @@ export class ExpenseRepository implements IExpenseRepository {
   getExpenseByUserId(userId: string): Promise<IExpense[]> {
     throw new Error('Method not implemented.');
   }
+
   findExpenses(filters: {
     userId: string;
     startDate?: Date;

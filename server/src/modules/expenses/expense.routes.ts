@@ -24,6 +24,7 @@ export const createExpenseRouter = (expenseController: ExpenseController) => {
     validateDTO(UpdateExpenseDTO),
     expenseController.updateExpense
   );
+  router.delete('/:id', validateObjectId, expenseController.deleteExpense);
 
   return router;
 };

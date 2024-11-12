@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { ExpenseService } from './expense.service';
 import { IExpenseController } from './interfaces/IExpenseController';
 import { NotFoundError, ValidationError } from '@/types/errors';
+import { IUser } from '../users/user.model';
 
 export class ExpenseController implements IExpenseController {
   constructor(private expenseService: ExpenseService) {}
@@ -14,6 +15,7 @@ export class ExpenseController implements IExpenseController {
     res.status(201).send({ message: 'hi' });
   };
 
+  // TODO: refactor to send user object directly, rather than id for querying
   createExpense = async (
     req: Request,
     res: Response,
@@ -61,6 +63,27 @@ export class ExpenseController implements IExpenseController {
         return next(new NotFoundError('User not found'));
       }
       res.status(200).send(updatedExpense);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  deleteExpense = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const expenseId = req.params.id;
+      const user: IUser = res.locals.user;
+      if (!user) {
+        throw new NotFoundError('User not found');
+      }
+      const deletedExpense = await this.expenseService.deleteExpense(
+        user,
+        expenseId
+      );
+      res.status(200).send(deletedExpense);
     } catch (error) {
       next(error);
     }

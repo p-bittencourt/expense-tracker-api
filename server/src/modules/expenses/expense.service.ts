@@ -8,6 +8,7 @@ import {
 import { IExpense } from './expense.model';
 import { ExpenseRepository } from './expense.repository';
 import { IExpenseService } from './interfaces/IExpenseService';
+import { IUser } from '../users/user.model';
 
 export class ExpenseService implements IExpenseService {
   constructor(
@@ -42,6 +43,19 @@ export class ExpenseService implements IExpenseService {
   ): Promise<ExpenseResponseDTO | null> {
     const expense = await this.expenseRepository.updateExpense(id, expenseData);
     if (!expense) return null;
+    return new ExpenseResponseDTO(expense);
+  }
+
+  async deleteExpense(
+    user: IUser,
+    expenseId: string
+  ): Promise<ExpenseResponseDTO | null> {
+    const expense = await this.expenseRepository.deleteExpense(expenseId);
+    if (!expense) return null;
+    const updatedUser = await this.userRepository.removeExpenseFromUser(
+      user,
+      expenseId
+    );
     return new ExpenseResponseDTO(expense);
   }
 }
