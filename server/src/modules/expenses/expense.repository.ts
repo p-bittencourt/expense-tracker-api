@@ -44,7 +44,7 @@ export class ExpenseRepository implements IExpenseRepository {
   async updateExpense(
     id: string,
     expenseData: UpdateExpenseDTO
-  ): Promise<IExpense | undefined> {
+  ): Promise<IExpense> {
     try {
       const updatedExpense = await Expense.findByIdAndUpdate(id, expenseData, {
         new: true,
@@ -53,9 +53,8 @@ export class ExpenseRepository implements IExpenseRepository {
         throw new NotFoundError(`Expense with ID ${id} not found`);
       return updatedExpense;
     } catch (error) {
-      if (!(error instanceof NotFoundError)) {
-        handleDatabaseError(error, 'getExpenseById');
-      }
+      if (error instanceof NotFoundError) throw error;
+      handleDatabaseError(error, 'getExpenseById');
     }
   }
 

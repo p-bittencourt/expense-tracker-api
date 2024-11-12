@@ -41,7 +41,6 @@ export class ExpenseService implements IExpenseService {
     expenseData: UpdateExpenseDTO
   ): Promise<ExpenseResponseDTO | null> {
     const expense = await this.expenseRepository.updateExpense(id, expenseData);
-    if (!expense) return null;
     return new ExpenseResponseDTO(expense);
   }
 
