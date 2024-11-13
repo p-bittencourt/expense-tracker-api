@@ -1,115 +1,26 @@
 import request from 'supertest';
-import { createApp } from '@/app';
-import { AdminUserRepository } from '@/modules/admin/admin.repository';
-import { AdminUserService } from '@/modules/admin/admin.service';
-import { AdminUserController } from '@/modules/admin/admin.controller';
-import type { IUser } from '@/modules/users/user.model';
-import {
-  CreateUserDTO,
-  UpdateUserDTO,
-  UserResponseDTO,
-} from '@/modules/users/user.dto';
+import { Application } from 'express';
+import { createTestApp, setupTestEnvironment } from './utils/setup';
+import { createTestDependencies } from './utils/factories';
 import { NotFoundError } from '@/types/errors';
-import type { Application, Express } from 'express';
-import mongoose from 'mongoose';
-import { ExpenseRepository } from '@/modules/expenses/expense.repository';
-import { ExpenseService } from '@/modules/expenses/expense.service';
-import { ExpenseController } from '@/modules/expenses/expense.controller';
-import {
-  mockAttachCurrentUser,
-  mockAuth,
-  mockCheckUserRole,
-} from '@/middleware/auth.middleware';
-import { UserRepository } from '@/modules/users/user.repository';
-import { UserController } from '@/modules/users/user.controller';
-import { UserService } from '@/modules/users/user.service';
-import { AppDependencies } from '@/types/app.dependencies';
+import { MOCKS } from './utils/mocks';
 
-// Mock the UserRepository and UserService
-jest.mock('@/modules/admin/admin.repository');
-jest.mock('@/modules/admin/admin.service');
-jest.mock('@/modules/users/user.repository');
-jest.mock('@/modules/users/user.service');
-jest.mock('@/modules/expenses/expense.repository');
-jest.mock('@/modules/expenses/expense.service');
-
-describe('AdminUser Controller', () => {
+describe('Admin User Controller - Users', () => {
   let app: Application;
-  let mockUserRepository: jest.Mocked<UserRepository>;
-  let mockUserService: jest.Mocked<UserService>;
-  let mockAdminUserRepository: jest.Mocked<AdminUserRepository>;
-  let mockAdminUserService: jest.Mocked<AdminUserService>;
-  let mockExpenseRepository: jest.Mocked<ExpenseRepository>;
-  let mockExpenseService: jest.Mocked<ExpenseService>;
-  let adminUserController: AdminUserController;
-  let userController: UserController;
-  let expenseController: ExpenseController;
+  let dependencies: ReturnType<typeof createTestDependencies>;
 
-  function initializeTestDependencies(): AppDependencies {
-    // Create our mock instances
-    mockUserRepository = new UserRepository() as jest.Mocked<UserRepository>;
-    mockUserService = new UserService(
-      mockUserRepository
-    ) as jest.Mocked<UserService>;
-    mockAdminUserRepository =
-      new AdminUserRepository() as jest.Mocked<AdminUserRepository>;
-    mockAdminUserService = new AdminUserService(
-      mockAdminUserRepository
-    ) as jest.Mocked<AdminUserService>;
-    mockExpenseRepository =
-      new ExpenseRepository() as jest.Mocked<ExpenseRepository>;
-    mockExpenseService = new ExpenseService(
-      mockExpenseRepository,
-      mockUserRepository
-    ) as jest.Mocked<ExpenseService>;
-    adminUserController = new AdminUserController(mockAdminUserService);
-    userController = new UserController(mockUserService);
-    expenseController = new ExpenseController(mockExpenseService);
-
-    return {
-      repositories: {
-        adminUser: mockAdminUserRepository,
-      },
-      services: {
-        adminUser: mockAdminUserService,
-      },
-      controllers: {
-        adminUser: adminUserController,
-        user: userController,
-        expense: expenseController,
-      },
-    };
-  }
+  setupTestEnvironment();
 
   beforeAll(() => {
-    // Create the app with our mocked controllers
-    const testDependencies = initializeTestDependencies();
-    // testDependencies.middleware = {
-    //   auth: () => mockAuth,
-    //   checkUserRole: mockCheckUserRole,
-    //   attachCurrentUser: mockAttachCurrentUser,
-    // };
-
-    app = createApp(testDependencies);
-    // Mock console.error to suppress error logs during tests
-    jest.spyOn(console, 'error').mockImplementation(() => {});
-  });
-
-  afterAll(async () => {
-    // Restore console.error after testso
-    jest.spyOn(console, 'error').mockRestore();
-    await mongoose.connection.close();
-  });
-
-  beforeEach(() => {
-    // clear all mock data before each test
-    jest.clearAllMocks();
+    dependencies = createTestDependencies();
+    app = createTestApp(dependencies);
   });
 
   describe('GET /api/v1/admin', () => {
-    // TODO: refactor get tests to use supertest's .expect()
     it('should retrieve an array of users', async () => {
-      mockAdminUserService.getAllUsers = jest.fn().mockResolvedValue([]);
+      dependencies.services.adminUser.getAllUsers = jest
+        .fn()
+        .mockResolvedValue([]);
 
       await request(app)
         .get('/api/v1/admin')
@@ -122,7 +33,7 @@ describe('AdminUser Controller', () => {
 
   describe('GET /api/v1/admin/:id', () => {
     it('should return 404 when user is not found', async () => {
-      mockAdminUserService.getUserById = jest
+      dependencies.services.adminUser.getUserById = jest
         .fn()
         .mockRejectedValue(new NotFoundError('User not found'));
 
@@ -130,7 +41,9 @@ describe('AdminUser Controller', () => {
         .get('/api/v1/admin/507f1f77bcf86cd799439011')
         .expect(404)
         .expect((res) => {
-          expect(mockAdminUserService.getUserById).toHaveBeenCalled();
+          expect(
+            dependencies.services.adminUser.getUserById
+          ).toHaveBeenCalled();
           expect(res.body).toEqual({
             message: 'User not found',
             status: 'not_found',
@@ -151,56 +64,37 @@ describe('AdminUser Controller', () => {
     });
 
     it('should return a user when found', async () => {
-      const mockUser: Partial<IUser> = {
-        _id: '507f1f77bcf86cd799439011',
-        username: 'JohnDoe',
-        email: 'john@example.com',
-        expenses: [],
-      };
-
-      mockAdminUserService.getUserById = jest
+      dependencies.services.adminUser.getUserById = jest
         .fn()
-        .mockResolvedValue(mockUser as IUser);
+        .mockResolvedValue(MOCKS.MOCKUSER);
 
       await request(app)
         .get('/api/v1/admin/507f1f77bcf86cd799439011')
         .expect(200)
         .expect((res) => {
-          expect(mockAdminUserService.getUserById).toHaveBeenCalled();
-          expect(res.body).toEqual(mockUser);
+          expect(
+            dependencies.services.adminUser.getUserById
+          ).toHaveBeenCalled();
+          expect(res.body).toEqual(MOCKS.MOCKUSER);
         });
     });
   });
 
   describe('POST /api/v1/admin', () => {
-    const validUser: CreateUserDTO = {
-      auth0Id: 'auth0|1234567890',
-      username: 'JohnDoe',
-      email: 'john@example.com',
-    };
-
-    it('should return 201 when user is successfully created', async () => {
-      const mockUser: Partial<IUser> = {
-        _id: '507f1f77bcf86cd799439011',
-        auth0Id: 'auth0|1234567890',
-        username: validUser.username,
-        email: validUser.email,
-        expenses: [],
-      };
-
-      mockAdminUserService.createUser = jest
+    it('should return 201 when user is suceessfully created', async () => {
+      dependencies.services.adminUser.createUser = jest
         .fn()
-        .mockResolvedValue(mockUser as IUser);
+        .mockResolvedValue(MOCKS.MOCKUSER);
 
       await request(app)
         .post('/api/v1/admin')
-        .send(validUser)
+        .send(MOCKS.VALIDUSERINPUT)
         .expect(201)
         .expect((res) => {
-          expect(res.body).toEqual(mockUser);
-          expect(mockAdminUserService.createUser).toHaveBeenCalledWith(
-            validUser
-          );
+          expect(res.body).toEqual(MOCKS.MOCKUSER);
+          expect(
+            dependencies.services.adminUser.createUser
+          ).toHaveBeenCalledWith(MOCKS.VALIDUSERINPUT);
         });
     });
 
@@ -216,14 +110,9 @@ describe('AdminUser Controller', () => {
     });
 
     it('should return 400 when required fields are missing', async () => {
-      const incompleteUser = {
-        username: 'John Doe',
-        // missing email
-      };
-
       await request(app)
         .post('/api/v1/admin')
-        .send(incompleteUser)
+        .send(MOCKS.INCOMPLETEUSER)
         .expect(400)
         .expect((res) => {
           expect(res.body).toHaveProperty('status', 'validation_error');
@@ -234,7 +123,7 @@ describe('AdminUser Controller', () => {
 
   describe('DELETE /api/admin/:id', () => {
     it('should return 404 NotFoundError if user not found', async () => {
-      mockAdminUserService.deleteUser = jest
+      dependencies.services.adminUser.deleteUser = jest
         .fn()
         .mockRejectedValue(new NotFoundError('User not found'));
 
@@ -247,21 +136,15 @@ describe('AdminUser Controller', () => {
     });
 
     it('should return 200 when successfully deleting the user', async () => {
-      const mockUser: Partial<IUser> = {
-        _id: '507f1f77bcf86cd799439011',
-        auth0Id: 'auth0|1234567890',
-        username: 'janeDoe',
-        email: 'janeDoe@email.com',
-        expenses: [],
-      };
-
-      mockAdminUserService.deleteUser = jest.fn().mockResolvedValue(mockUser);
+      dependencies.services.adminUser.deleteUser = jest
+        .fn()
+        .mockResolvedValue(MOCKS.MOCKUSER);
 
       await request(app)
         .delete('/api/v1/admin/507f1f77bcf86cd799439011')
         .expect(200)
         .expect((res) => {
-          expect(res.body).toHaveProperty('user', mockUser);
+          expect(res.body).toHaveProperty('user', MOCKS.MOCKUSER);
           expect(res.body).toHaveProperty(
             'message',
             'User successfully deleted'
@@ -272,27 +155,22 @@ describe('AdminUser Controller', () => {
 
   describe('PATCH /api/v1/admin/:id', () => {
     it('should successfully update an user', async () => {
-      const mockUser: Partial<IUser> = {
-        _id: '507f1f77bcf86cd799439011',
-        auth0Id: 'auth0|1234567890',
-        username: 'janeDoe',
-        email: 'janedoe@email.com',
-        expenses: [],
-      };
-      mockAdminUserService.updateUser = jest.fn().mockResolvedValue(mockUser);
+      dependencies.services.adminUser.updateUser = jest
+        .fn()
+        .mockResolvedValue(MOCKS.MOCKUSER);
 
       await request(app)
         .patch('/api/v1/admin/507f1f77bcf86cd799439011')
         .send({ email: 'janedoe@email.com' })
         .expect(200)
         .expect((res) => {
-          expect(res.body.user.email).toEqual(mockUser.email);
-          expect(mockAdminUserService.updateUser).toHaveBeenCalled();
+          expect(res.body.user.email).toEqual(MOCKS.MOCKUSER.email);
+          expect(dependencies.services.adminUser.updateUser).toHaveBeenCalled();
         });
     });
 
     it('should return 404 NotFoundError if user not found', async () => {
-      mockAdminUserService.updateUser = jest
+      dependencies.services.adminUser.updateUser = jest
         .fn()
         .mockRejectedValue(new NotFoundError('User not found'));
 

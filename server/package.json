@@ -5,9 +5,11 @@
   "scripts": {
     "start": "ts-node -r tsconfig-paths/register src/server.ts",
     "dev": "nodemon -r tsconfig-paths/register src/server.ts",
-    "build": "tsc",
-    "serve": "node dist/app.js",
-    "test": "jest --detectOpenHandles"
+    "test": "jest --detectOpenHandles",
+    "clean": "rimraf dist",
+    "build": "npm run clean && tsc",
+    "serve": "node -r dotenv/config dist/server.js",
+    "start:prod": "npm run build && npm run serve"
   },
   "author": "",
   "license": "ISC",
