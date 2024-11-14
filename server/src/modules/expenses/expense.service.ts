@@ -5,10 +5,15 @@ import {
   ExpenseResponseDTO,
   UpdateExpenseDTO,
 } from './expense.dto';
-import { IExpense } from './expense.model';
 import { ExpenseRepository } from './expense.repository';
 import { IExpenseService } from './interfaces/IExpenseService';
 import { IUser } from '../users/user.model';
+import { UserResponseDTO } from '../users/user.dto';
+
+interface FullExpenseResponse {
+  expense: ExpenseResponseDTO;
+  user: UserResponseDTO;
+}
 
 export class ExpenseService implements IExpenseService {
   constructor(
@@ -16,10 +21,11 @@ export class ExpenseService implements IExpenseService {
     private userRepository: UserRepository
   ) {}
 
+  // TODO: Implement some expense filtering
   async createExpense(
     user: IUser,
     expenseData: CreateExpenseDTO
-  ): Promise<ExpenseResponseDTO | null> {
+  ): Promise<FullExpenseResponse> {
     const userId = user._id as unknown as ObjectId;
     const expense = await this.expenseRepository.createExpense(
       userId,
@@ -29,7 +35,10 @@ export class ExpenseService implements IExpenseService {
       user,
       expense.id
     );
-    return new ExpenseResponseDTO(expense);
+    return {
+      expense: new ExpenseResponseDTO(expense),
+      user: new UserResponseDTO(updatedUser),
+    };
   }
 
   async getExpenseById(id: string): Promise<ExpenseResponseDTO> {
@@ -40,7 +49,7 @@ export class ExpenseService implements IExpenseService {
   async updateExpense(
     id: string,
     expenseData: UpdateExpenseDTO
-  ): Promise<ExpenseResponseDTO | null> {
+  ): Promise<ExpenseResponseDTO> {
     const expense = await this.expenseRepository.updateExpense(id, expenseData);
     return new ExpenseResponseDTO(expense);
   }
@@ -48,12 +57,15 @@ export class ExpenseService implements IExpenseService {
   async deleteExpense(
     user: IUser,
     expenseId: string
-  ): Promise<ExpenseResponseDTO> {
+  ): Promise<FullExpenseResponse> {
     const expense = await this.expenseRepository.deleteExpense(expenseId);
     const updatedUser = await this.userRepository.removeExpenseFromUser(
       user,
       expenseId
     );
-    return new ExpenseResponseDTO(expense);
+    return {
+      expense: new ExpenseResponseDTO(expense),
+      user: new UserResponseDTO(updatedUser),
+    };
   }
 }

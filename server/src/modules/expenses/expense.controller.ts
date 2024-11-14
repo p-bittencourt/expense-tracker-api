@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ExpenseService } from './expense.service';
 import { IExpenseController } from './interfaces/IExpenseController';
-import { NotFoundError, ValidationError } from '@/types/errors';
+import { AppError, NotFoundError, ValidationError } from '@/types/errors';
 import { IUser } from '../users/user.model';
 
 export class ExpenseController implements IExpenseController {
@@ -27,8 +27,9 @@ export class ExpenseController implements IExpenseController {
       if (!user) {
         throw new NotFoundError('User not found');
       }
-      const expense = await this.expenseService.createExpense(user, req.body);
-      res.status(201).send(expense);
+      const result = await this.expenseService.createExpense(user, req.body);
+      const { expense, user: updatedUser } = result;
+      res.status(201).send({ expense, updatedUser });
     } catch (error) {
       next(error);
     }
@@ -60,9 +61,6 @@ export class ExpenseController implements IExpenseController {
         expenseId,
         expenseData
       );
-      if (!updatedExpense) {
-        return next(new NotFoundError('User not found'));
-      }
       res.status(200).send(updatedExpense);
     } catch (error) {
       next(error);
@@ -80,11 +78,9 @@ export class ExpenseController implements IExpenseController {
       if (!user) {
         throw new NotFoundError('User not found');
       }
-      const deletedExpense = await this.expenseService.deleteExpense(
-        user,
-        expenseId
-      );
-      res.status(200).send(deletedExpense);
+      const result = await this.expenseService.deleteExpense(user, expenseId);
+      const { expense: deletedExpense, user: updatedUser } = result;
+      res.status(200).send({ deletedExpense, updatedUser });
     } catch (error) {
       next(error);
     }
