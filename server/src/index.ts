@@ -16,6 +16,8 @@ const app = createApp({
   },
   services: {
     adminUser: dependencies.adminUserService,
+    user: dependencies.userService,
+    expense: dependencies.expenseService,
   },
 
   // Activate for manual testing

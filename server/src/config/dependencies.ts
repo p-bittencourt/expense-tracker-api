@@ -24,6 +24,8 @@ export function initializeDependencies() {
     adminUserController,
     adminUserService,
     userController,
+    userService,
     expenseController,
+    expenseService,
   };
 }

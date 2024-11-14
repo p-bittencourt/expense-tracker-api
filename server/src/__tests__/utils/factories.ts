@@ -53,6 +53,8 @@ export function createTestDependencies(): AppDependencies {
     },
     services: {
       adminUser: mockAdminUserService,
+      expense: mockExpenseService,
+      user: mockUserService,
     },
     controllers: {
       adminUser: adminUserController,

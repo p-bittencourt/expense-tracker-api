@@ -14,4 +14,13 @@ export const MOCKS = {
   INCOMPLETEUSER: {
     username: 'JohnDoe',
   },
+  MOCKEXPENSE: {
+    title: 'jest test expense',
+    cost: 5,
+    type: 'OTHER',
+  },
+  VALIDEXPENSEINPUT: {
+    title: 'jest test expense',
+    cost: 5,
+  },
 };
