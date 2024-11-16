@@ -23,4 +23,7 @@ export const MOCKS = {
     title: 'jest test expense',
     cost: 5,
   },
+  INCOMPLETEEXPENSE: {
+    title: 'wrong test input',
+  },
 };

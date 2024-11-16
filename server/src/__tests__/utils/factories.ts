@@ -16,6 +16,10 @@ jest.mock('@/modules/users/user.repository');
 jest.mock('@/modules/users/user.service');
 jest.mock('@/modules/expenses/expense.repository');
 jest.mock('@/modules/expenses/expense.service');
+jest.mock('express-openid-connect', () => ({
+  requiresAuth: () => (req: any, res: any, next: any) => next(),
+  auth: () => (req: any, res: any, next: any) => next(),
+}));
 
 export function createTestDependencies(): AppDependencies {
   let mockUserRepository: jest.Mocked<UserRepository>;
@@ -58,8 +62,8 @@ export function createTestDependencies(): AppDependencies {
     },
     controllers: {
       adminUser: adminUserController,
-      user: userController,
       expense: expenseController,
+      user: userController,
     },
   };
 }

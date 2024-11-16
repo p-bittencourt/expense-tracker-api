@@ -18,6 +18,7 @@ export const validateObjectId = (
 
 export const validateDTO = (dtoClass: any) => {
   return async (req: Request, res: Response, next: NextFunction) => {
+    console.log('calls validation dto');
     if (!req.body || Object.keys(req.body).length === 0) {
       return next(new ValidationError('Request body is required'));
     }

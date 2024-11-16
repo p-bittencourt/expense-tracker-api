@@ -9,15 +9,15 @@ const app = createApp({
   repositories: {
     adminUser: dependencies.adminUserRepository,
   },
-  controllers: {
-    adminUser: dependencies.adminUserController,
-    user: dependencies.userController,
-    expense: dependencies.expenseController,
-  },
   services: {
     adminUser: dependencies.adminUserService,
     user: dependencies.userService,
     expense: dependencies.expenseService,
+  },
+  controllers: {
+    adminUser: dependencies.adminUserController,
+    user: dependencies.userController,
+    expense: dependencies.expenseController,
   },
 
   // Activate for manual testing

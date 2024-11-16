@@ -23,14 +23,17 @@ export class ExpenseController implements IExpenseController {
     next: NextFunction
   ): Promise<void> => {
     try {
+      console.log('Debug - res.locals:', res.locals); // Add this
       const user: IUser = res.locals.user;
       if (!user) {
+        console.log('Debug - No user found in res.locals'); // Add this
         throw new NotFoundError('User not found');
       }
       const result = await this.expenseService.createExpense(user, req.body);
       const { expense, user: updatedUser } = result;
       res.status(201).send({ expense, updatedUser });
     } catch (error) {
+      console.log('Debug - Error caught:', error); // Add this
       next(error);
     }
   };
